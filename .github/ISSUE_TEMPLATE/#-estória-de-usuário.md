@@ -1,11 +1,4 @@
----
-name: "# Estória de Usuário"
-about: Defina a história de usuário
-title: ''
-labels: documentation
-assignees: luucas-melo
-
----
+# USX - Descrição da estória de usuário
 
 ## Critérios de aceitação
 [ ] Critério 1
