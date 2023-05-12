@@ -15,11 +15,11 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 
+const isOpen = true;
+
+const onClose = () => {};
+
 const Login = () => {
-  const isOpen = true;
-
-  const onClose = () => {};
-
   const {
     dispatch,
     state: { status, isMetamaskInstalled, wallet },
@@ -53,6 +53,7 @@ const Login = () => {
   };
   return (
     <>
+      <h1>AUTH FRONTAL!! DEFAULT!!</h1>
       <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay background="blackAlpha.800" />
         <ModalContent>

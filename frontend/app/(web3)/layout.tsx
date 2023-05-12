@@ -57,11 +57,13 @@ export default function Web3Layout({
 
   return (
     <>
+      <h1>WEB3 LAYOUT</h1>
+      <br />
       <Link href="/login">teste</Link>
       {String(isConnected)}
       {status}
       {children}
-      {auth}
+      {!isConnected ? auth : null}
     </>
   );
 }
