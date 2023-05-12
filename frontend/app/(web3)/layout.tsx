@@ -1,19 +1,15 @@
 "use client";
 import Wallet from "@/components/Wallet";
 import { useListen } from "@/hooks/useListen";
-import { VotingAbi } from "@/constants/VotingAbi";
 import { useMetamask } from "@/hooks/useMetamask";
-import { Button } from "@chakra-ui/react";
-import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
-import { web3 } from "@/lib/web3";
-
-const inter = Inter({ subsets: ["latin"] });
+import React, { useEffect } from "react";
 
 export default function Web3Layout({
   children,
+  auth,
 }: {
   children: React.ReactNode;
+  auth: React.ReactNode;
 }) {
   const {
     dispatch,
@@ -47,5 +43,10 @@ export default function Web3Layout({
     }
   }, []);
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      {auth}
+    </>
+  );
 }
