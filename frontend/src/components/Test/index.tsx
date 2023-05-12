@@ -1,6 +1,6 @@
 import Wallet from "@/components/Wallet";
 import { useListen } from "@/hooks/useListen";
-import { abi } from "@/constants/abi";
+import { VotingAbi } from "@/constants/VotingAbi";
 import { useMetamask } from "@/hooks/useMetamask";
 import { Button } from "@chakra-ui/react";
 import { Inter } from "next/font/google";
@@ -9,7 +9,7 @@ import Web3 from "web3";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+export const Test = ({ contractAddress }) => {
   const {
     dispatch,
     state: { isMetamaskInstalled, status, wallet },
@@ -45,16 +45,16 @@ export default function Home() {
 
   const [contract, setContract] = useState(null);
 
-  let contractAddress = "0x1f49444De78Bd325C2A3C1C4550fF6BBF5FbEEd1"; // hard coded for now
+  //   let contractAddress = "0x1f49444De78Bd325C2A3C1C4550fF6BBF5FbEEd1"; // hard coded for now
 
   const add = async () => {
     if (!wallet) return;
 
-    const contract = new web3.eth.Contract(abi, contractAddress);
+    const contract = new web3.eth.Contract(VotingAbi, contractAddress);
 
     const inputConsts = "0xDf3f47571FD69590dA954777562E8751869c9817"; // hard coded for now
 
-    const data = contract.methods.addToWhiteList(inputConsts).encodeABI();
+    const data = contract.methods.addToWhiteList(inputConsts).encodeVotingAbi();
     console.log("data", data);
     // Define the gas price and gas limit
     const gasPrice = await web3.eth.getGasPrice();
@@ -84,11 +84,11 @@ export default function Home() {
   const vote = async () => {
     if (!wallet) return;
 
-    const contract = new web3.eth.Contract(abi, contractAddress);
+    const contract = new web3.eth.Contract(VotingAbi, contractAddress);
 
     const inputConsts = 1;
 
-    const data = contract.methods.vote(inputConsts).encodeABI();
+    const data = contract.methods.vote(inputConsts).encodeVotingAbi();
     console.log("data", data);
     // Define the gas price and gas limit
     const gasPrice = await web3.eth.getGasPrice();
@@ -116,7 +116,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    let c = new web3.eth.Contract(abi, contractAddress);
+    let c = new web3.eth.Contract(VotingAbi, contractAddress);
     setContract(c);
   }, []);
 
@@ -127,4 +127,4 @@ export default function Home() {
       <Wallet />
     </>
   );
-}
+};
