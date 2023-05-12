@@ -3,6 +3,7 @@ import { useListen } from "@/hooks/useListen";
 import { useMetamask } from "@/hooks/useMetamask";
 import {
   Button,
+  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,8 +11,9 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useDisclosure,
+  Text,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 
 const Login = () => {
   const isOpen = true;
@@ -20,16 +22,13 @@ const Login = () => {
 
   const {
     dispatch,
-    state: { status, isMetamaskInstalled, wallet, balance },
+    state: { status, isMetamaskInstalled, wallet },
   } = useMetamask();
+
   const listen = useListen();
 
-  const showInstallMetamask =
-    status !== "pageNotLoaded" && !isMetamaskInstalled;
   const showConnectButton =
     status !== "pageNotLoaded" && isMetamaskInstalled && !wallet;
-
-  const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
 
   const handleConnect = async () => {
     dispatch({ type: "loading" });
@@ -54,18 +53,33 @@ const Login = () => {
   };
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
+      <Modal isCentered isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay background="blackAlpha.800" />
         <ModalContent>
-          <ModalHeader>Modal Title</ModalHeader>
+          <ModalHeader>Authentication</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>aaaa</ModalBody>
+          <ModalBody>
+            <Text fontSize="lg">
+              Connect in your metamask wallet to continue
+            </Text>
+          </ModalBody>
 
-          <ModalFooter>
-            <Button colorScheme="blue" mr={3}>
-              Close
-            </Button>
-            <Button variant="ghost">Secondary Action</Button>
+          <ModalFooter flexDirection="column" justifyContent="center" gap={6}>
+            {showConnectButton && (
+              <Button
+                isLoading={status === "loading"}
+                size="lg"
+                onClick={handleConnect}
+              >
+                Connect Wallet
+              </Button>
+            )}
+            <Text>
+              Don't have Metamask?{" "}
+              <Link as={NextLink} href="https://metamask.io/" target="_blank">
+                Get Metamask
+              </Link>
+            </Text>
           </ModalFooter>
         </ModalContent>
       </Modal>

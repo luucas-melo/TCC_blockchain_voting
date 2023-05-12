@@ -26,6 +26,7 @@
     "web3": "^1.9.0"
   },
   "devDependencies": {
+    "encoding": "^0.1.13",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.6.0",

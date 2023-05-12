@@ -5,7 +5,6 @@ import { useMetamask } from "@/hooks/useMetamask";
 import { web3 } from "@/lib/web3";
 import { Button, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-
 const CreateVoting = () => {
   const votingFactoryAddress = "0xAD3419a9111C58CfEa0FC45Eb3d5E0d44441913A";
   const [votings, setVotings] = useState<string[]>([]);
@@ -49,12 +48,17 @@ const CreateVoting = () => {
     const gasPrice = await web3.eth.getGasPrice();
     console.log("gasPrice", gasPrice);
     console.log("wallet", wallet);
+
+    const nounce = await web3.eth.getTransactionCount(wallet);
+    const gas = await contract.methods.deploy(...inputConsts).estimateGas();
+
     const tx = {
       from: wallet,
       to: votingFactoryAddress,
       data,
-      gas: "2000000000", // hard coded for now
+      gas: gas,
       gasPrice,
+      nounce,
     };
 
     let gasLimit = await web3.eth.estimateGas(tx);

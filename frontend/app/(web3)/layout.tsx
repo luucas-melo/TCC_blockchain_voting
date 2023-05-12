@@ -3,7 +3,8 @@ import Wallet from "@/components/Wallet";
 import { useListen } from "@/hooks/useListen";
 import { useMetamask } from "@/hooks/useMetamask";
 import React, { useEffect } from "react";
-
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function Web3Layout({
   children,
   auth,
@@ -43,8 +44,22 @@ export default function Web3Layout({
     }
   }, []);
 
+  const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
+
+  const router = useRouter();
+
+  //   useEffect(() => {
+  //     console.log(isConnected);
+  //     if (!isConnected && status !== "loading") {
+  //       router.push("/login");
+  //     }
+  //   }, [isConnected, status]);
+
   return (
     <>
+      <Link href="/login">teste</Link>
+      {String(isConnected)}
+      {status}
       {children}
       {auth}
     </>
