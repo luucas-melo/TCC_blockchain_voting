@@ -45,7 +45,6 @@ export default function Web3Layout({
   }, []);
 
   const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
-
   const router = useRouter();
 
   //   useEffect(() => {

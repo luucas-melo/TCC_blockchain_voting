@@ -1,13 +1,13 @@
 "use client";
 import { Test } from "@/components/Test";
 import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
+import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
 import { useMetamask } from "@/hooks/useMetamask";
 import { web3 } from "@/lib/web3";
 import { Button, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
 const CreateVoting = () => {
-  const votingFactoryAddress = "0xAD3419a9111C58CfEa0FC45Eb3d5E0d44441913A";
   const [votings, setVotings] = useState<string[]>([]);
 
   const {
