@@ -1,2 +1,2 @@
 export const votingFactoryAddress =
-  "0x4cf4935aeB9724Aa6c184B91D43BDF7b6A289A47";
+  "0xe226f12F2eF7e10060a52726e38241552c97d7D7";

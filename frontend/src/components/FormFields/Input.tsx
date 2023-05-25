@@ -1,5 +1,4 @@
 import { ReactElement } from "react";
-import { FieldError } from "react-hook-form";
 import {
   FormControl,
   FormErrorMessage,
@@ -12,6 +11,7 @@ import {
   InputGroup,
   InputProps as ChakraInputProps,
 } from "@chakra-ui/react";
+import { FieldError } from "react-hook-form";
 
 export interface InputProps extends ChakraInputProps {
   label?: string | JSX.Element;
@@ -25,11 +25,11 @@ export interface InputProps extends ChakraInputProps {
    *   <Input errors={errors?.password} />;
    */
   errors?: FieldError | undefined;
+  helperText?: string;
   rightElement?: ReactElement<InputElementProps>;
   leftElement?: ReactElement<InputElementProps>;
   rightAddon?: ReactElement<InputAddonProps>;
   leftAddon?: ReactElement<InputAddonProps>;
-  helperText?: string;
 }
 
 /**
@@ -46,6 +46,7 @@ export const Input = forwardRef<InputProps, "input">((props, ref) => {
   const {
     label,
     errors,
+    helperText,
     rightElement,
     leftElement,
     rightAddon,
@@ -53,27 +54,28 @@ export const Input = forwardRef<InputProps, "input">((props, ref) => {
     size,
     width,
     flex,
-    helperText,
     ...rest
   } = props;
 
   return (
     <FormControl
       isInvalid={Boolean(errors)}
-      width={width || "100%"}
+      width={width || "auto"}
       isRequired={props?.required || props?.isRequired}
       isDisabled={props?.isDisabled}
       flex={flex}
     >
-      {label && <FormLabel>{label}</FormLabel>}
+      <FormLabel>{label}</FormLabel>
+
       <InputGroup size={size}>
         {leftAddon ?? null}
         {leftElement ?? null}
-        <ChakraInput {...rest} ref={ref} />
+        <ChakraInput ref={ref} {...rest} />
         {rightAddon ?? null}
         {rightElement ?? null}
       </InputGroup>
-      {helperText && <FormHelperText>{helperText}</FormHelperText>}
+
+      <FormHelperText>{helperText}</FormHelperText>
       <FormErrorMessage color="red.300">{errors?.message}</FormErrorMessage>
     </FormControl>
   );
