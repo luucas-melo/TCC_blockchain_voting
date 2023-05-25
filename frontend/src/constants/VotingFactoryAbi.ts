@@ -1,4 +1,5 @@
 import { AbiItem } from "web3-utils";
+
 export const VotingFactoryAbi: AbiItem[] = [
   {
     anonymous: false,

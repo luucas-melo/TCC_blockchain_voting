@@ -65,7 +65,7 @@ export const Textarea = forwardRef<InputProps, "input">((props, ref) => {
       isDisabled={props?.isDisabled}
       flex={flex}
     >
-      {label && <FormLabel>{label}</FormLabel>}
+      {label && <FormLabel marginBottom={1}>{label}</FormLabel>}
       <InputGroup size={size}>
         <ChakraTextarea {...rest} ref={ref} />
       </InputGroup>

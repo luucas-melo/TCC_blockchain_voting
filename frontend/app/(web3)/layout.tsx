@@ -1,10 +1,11 @@
 "use client";
-import Wallet from "@/components/Wallet";
+
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+
 import { useListen } from "@/hooks/useListen";
 import { useMetamask } from "@/hooks/useMetamask";
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+
 export default function Web3Layout({
   children,
   auth,
@@ -47,6 +48,8 @@ export default function Web3Layout({
   const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
   const router = useRouter();
 
+  console.log("isConnected", isConnected, wallet);
+
   //   useEffect(() => {
   //     console.log(isConnected);
   //     if (!isConnected && status !== "loading") {
@@ -56,11 +59,6 @@ export default function Web3Layout({
 
   return (
     <>
-      <h1>WEB3 LAYOUT</h1>
-      <br />
-      <Link href="/login">teste</Link>
-      {String(isConnected)}
-      {status}
       {children}
       {!isConnected ? auth : null}
     </>

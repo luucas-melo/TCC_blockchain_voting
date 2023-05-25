@@ -65,7 +65,7 @@ export const Input = forwardRef<InputProps, "input">((props, ref) => {
       isDisabled={props?.isDisabled}
       flex={flex}
     >
-      <FormLabel>{label}</FormLabel>
+      <FormLabel marginBottom={1}>{label}</FormLabel>
 
       <InputGroup size={size}>
         {leftAddon ?? null}
