@@ -14,17 +14,23 @@ on:
     paths:
       - 'frontend/**'
 
+defaults:
+  run:
+    working-directory: frontend
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       # - name: Checkout code
       - uses: actions/checkout@v3
+
       # - name: Use Node.js 16.x
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: 'yarn'
+          cache-dependency-path: ./frontend/yarn.lock
 
       - name: 🧰 Install dependencies
         run: yarn install
@@ -42,6 +48,7 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
+          cache-dependency-path: ./frontend/yarn.lock
 
       - name: 🧰 Install dependencies
         run: yarn install
@@ -59,6 +66,7 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
+          cache-dependency-path: ./frontend/yarn.lock
 
       - name: 🧰 Install dependencies
         run: yarn install
@@ -77,6 +85,7 @@ jobs:
         with:
           node-version: 16.x
           cache: 'yarn'
+          cache-dependency-path: ./frontend/yarn.lock
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path

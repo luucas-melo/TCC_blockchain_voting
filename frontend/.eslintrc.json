@@ -12,7 +12,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./frontend/tsconfig.json"
+    "project": "tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",
@@ -27,8 +27,9 @@
     // React rules
     "react/require-default-props": "off",
     "react/jsx-props-no-spreading": "off",
-    "react-perf/jsx-no-new-object-as-prop": "warn",
-    "react-perf/jsx-no-new-array-as-prop": "warn",
+    "react-perf/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-array-as-prop": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
     "no-inline-styles/no-inline-styles": "error",
 
     // eslint rules
@@ -40,7 +41,16 @@
     // "no-console": "off", // All consoles are automatically removed in production
 
     // import rules
-    "import/extensions": ["warn", "ignorePackages"],
+    "import/extensions": [
+      "off",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
     "import/prefer-default-export": "off",
     "import/no-default-export": "error",
     "simple-import-sort/imports": "warn",

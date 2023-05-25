@@ -16,8 +16,8 @@ export function BackButton() {
       onClick={router.back}
       icon={<Icon as={TiArrowBack} />}
       variant="outline"
-      size="lg"
-      colorScheme=""
+      size="md"
+      colorScheme="gray"
     />
   );
 }

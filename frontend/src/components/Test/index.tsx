@@ -1,15 +1,16 @@
-import Wallet from "@/components/Wallet";
-import { useListen } from "@/hooks/useListen";
-import { VotingAbi } from "@/constants/VotingAbi";
-import { useMetamask } from "@/hooks/useMetamask";
 import { Button } from "@chakra-ui/react";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
 import Web3 from "web3";
 
+import { Wallet } from "@/components/Wallet";
+import { VotingAbi } from "@/constants/VotingAbi";
+import { useListen } from "@/hooks/useListen";
+import { useMetamask } from "@/hooks/useMetamask";
+
 const inter = Inter({ subsets: ["latin"] });
 
-export const Test = ({ contractAddress }) => {
+export function Test({ contractAddress }) {
   const {
     dispatch,
     state: { isMetamaskInstalled, status, wallet },
@@ -68,7 +69,7 @@ export const Test = ({ contractAddress }) => {
       gasPrice,
     };
 
-    let gasLimit = await web3.eth.estimateGas(tx);
+    const gasLimit = await web3.eth.estimateGas(tx);
     console.log("gasLimit", gasLimit);
     tx.gas = (gasLimit * 1.5).toFixed(0);
 
@@ -102,7 +103,7 @@ export const Test = ({ contractAddress }) => {
       gasPrice,
     };
 
-    let gasLimit = await web3.eth.estimateGas(tx);
+    const gasLimit = await web3.eth.estimateGas(tx);
     console.log("gasLimit", gasLimit);
     tx.gas = (gasLimit * 1.5).toFixed(0);
 
@@ -116,7 +117,7 @@ export const Test = ({ contractAddress }) => {
   };
 
   useEffect(() => {
-    let c = new web3.eth.Contract(VotingAbi, contractAddress);
+    const c = new web3.eth.Contract(VotingAbi, contractAddress);
     setContract(c);
   }, []);
 
@@ -127,4 +128,4 @@ export const Test = ({ contractAddress }) => {
       <Wallet />
     </>
   );
-};
+}

@@ -1,11 +1,13 @@
 "use client";
-import { Test } from "@/components/Test";
-import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
-import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
-import { useMetamask } from "@/hooks/useMetamask";
-import { web3 } from "@/lib/web3";
+
 import { Button, Flex } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+
+import { Test } from "@/components/Test";
+import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
+import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
+import { useMetamask } from "@/hooks/useMetamask";
+import { web3 } from "@/lib/web3";
 
 const TestPage = () => {
   const [votings, setVotings] = useState<string[]>([]);
@@ -15,6 +17,7 @@ const TestPage = () => {
     dispatch,
   } = useMetamask();
   console.log(wallet);
+
   const getAllVoting = async () => {
     console.log(wallet);
     if (!wallet) return;
@@ -57,7 +60,7 @@ const TestPage = () => {
       gasPrice,
     };
 
-    let gasLimit = await web3.eth.estimateGas(tx);
+    const gasLimit = await web3.eth.estimateGas(tx);
     tx.gas = (gasLimit * 1.5).toFixed(0);
 
     const res = await web3.eth.sendTransaction(tx, (error, transactionHash) => {
@@ -84,7 +87,7 @@ const TestPage = () => {
         Create voting
       </Button>
       {votings?.map((votingAddress) => (
-        <Test contractAddress={votingAddress} />
+        <Test contractAddress={votingAddress} key={votingAddress} />
       ))}
     </Flex>
   );
