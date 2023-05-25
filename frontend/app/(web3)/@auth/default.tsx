@@ -1,6 +1,5 @@
 "use client";
-import { useListen } from "@/hooks/useListen";
-import { useMetamask } from "@/hooks/useMetamask";
+
 import {
   Button,
   Link,
@@ -14,6 +13,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+
+import { useListen } from "@/hooks/useListen";
+import { useMetamask } from "@/hooks/useMetamask";
 
 const isOpen = true;
 
@@ -51,6 +53,7 @@ const Login = () => {
   const handleDisconnect = () => {
     dispatch({ type: "disconnect" });
   };
+
   return (
     <>
       <h1>AUTH FRONTAL!! DEFAULT!!</h1>

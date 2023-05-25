@@ -1,25 +1,18 @@
 {
   "extends": [
-    // "plugin:@typescript-eslint/recommended",
     "plugin:eslint-comments/recommended",
     "plugin:import/typescript",
-    // "plugin:prettier/recommended",
     "plugin:react-perf/recommended",
     "airbnb",
     "airbnb-typescript",
     "plugin:@next/next/recommended",
     "next/core-web-vitals",
-    "next",
+    // "next",
     "prettier"
   ],
-  // "parser": "@typescript-eslint/parser",
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    // "ecmaFeatures": {
-    // 	"jsx": true
-    // },
-    // "sourceType": "module",
-    // "tsconfigRootDir": "codhab-web,
-    "project": "./tsconfig.json"
+    "project": "tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint",
@@ -34,16 +27,30 @@
     // React rules
     "react/require-default-props": "off",
     "react/jsx-props-no-spreading": "off",
-    "react-perf/jsx-no-new-object-as-prop": "warn",
-    "react-perf/jsx-no-new-array-as-prop": "warn",
+    "react-perf/jsx-no-new-object-as-prop": "off",
+    "react-perf/jsx-no-new-array-as-prop": "off",
+    "react-perf/jsx-no-new-function-as-prop": "off",
     "no-inline-styles/no-inline-styles": "error",
 
     // eslint rules
     // "eslint-comments/no-use": ["warn", { "allow": [] }],
-    "eslint-comments/require-description": ["error", { "ignore": ["eslint-enable"] }],
-    "no-console": "off", // All consoles are automatically removed in production
+    "eslint-comments/require-description": [
+      "error",
+      { "ignore": ["eslint-enable"] }
+    ],
+    // "no-console": "off", // All consoles are automatically removed in production
 
     // import rules
+    "import/extensions": [
+      "off",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
     "import/prefer-default-export": "off",
     "import/no-default-export": "error",
     "simple-import-sort/imports": "warn",
@@ -53,6 +60,8 @@
     "import/no-duplicates": "error",
     "import/no-cycle": "error",
     "unused-imports/no-unused-imports": "warn",
+    "no-unused-vars": "off", // We use unused-imports/no-unused-vars instead
+    "@typescript-eslint/no-unused-vars": "off", // We use unused-imports/no-unused-vars instead
     "unused-imports/no-unused-vars": [
       "warn",
       {
@@ -78,8 +87,40 @@
     ],
 
     // typescript rules
-    "@typescript-eslint/no-unused-vars": "off",
     "padding-line-between-statements": "off",
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "default",
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      },
+      {
+        "selector": "objectLiteralProperty",
+        "format": null,
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "interface",
+        "format": ["PascalCase", "UPPER_CASE"],
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "typeProperty",
+        "format": null,
+        "leadingUnderscore": "allow",
+        "trailingUnderscore": "allow"
+      },
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": false
+        }
+      }
+    ],
     "@typescript-eslint/padding-line-between-statements": [
       "warn",
       {
@@ -127,7 +168,7 @@
   "ignorePatterns": ["**/*.json", "**/*.js"],
   "overrides": [
     {
-      "files": ["src/**/*", "__tests__/**/*"],
+      "files": ["*/src/**/*", "__tests__/**/*"],
       "rules": {
         "simple-import-sort/imports": [
           "warn",
@@ -139,11 +180,9 @@
                 "^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)"
               ],
               // Packages. `react` related packages come first.
-              ["^react$", "^next", "^react", "^@?\\w"],
+              ["^next", "^react$", "^@chakra", "^react", "^@?\\w"],
               // Internal packages.
-              [
-                "^(@components|@routes|@pages|@hooks|@contexts|@templates|@layouts|@public|@constants|@utils|@controllers|@models|@services|@company|@ui|@UI|@stripe|@database|@aws|@lib|components|utils|config|vendored-lib|@prismadb)(/.*|$|..)"
-              ],
+              ["^(@/)(/.*|$|..)"],
               // Side effect imports.
               ["^\\u0000"],
               // Parent imports. Put `..` last.
@@ -158,10 +197,25 @@
       }
     },
     {
-      "files": ["*/pages/**/*", "middleware.ts"],
+      "files": ["*/pages/**/*", "middleware.ts", "app/**/*"],
       "rules": {
         "import/no-default-export": "off",
         "react/function-component-definition": "off"
+      }
+    },
+    {
+      "files": ["plopfile.js", "plopfile.mjs"],
+      "rules": {
+        "import/no-default-export": "off",
+        "react/function-component-definition": "off",
+        "import/no-anonymous-default-export": "off",
+        "func-names": "off"
+      }
+    },
+    {
+      "files": ["*/_dev-tools/**/*"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
       }
     }
   ]

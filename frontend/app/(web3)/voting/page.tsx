@@ -1,11 +1,12 @@
 "use client";
-import { Test } from "@/components/Test";
-import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
+
+import { Flex } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+
 import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
+import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
 import { useMetamask } from "@/hooks/useMetamask";
 import { web3 } from "@/lib/web3";
-import { Button, Flex } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 
 const CreateVoting = () => {
   const [votings, setVotings] = useState<string[]>([]);
@@ -15,6 +16,7 @@ const CreateVoting = () => {
     dispatch,
   } = useMetamask();
   console.log(wallet);
+
   const getAllVoting = async () => {
     console.log(wallet);
     if (!wallet) return;
@@ -57,7 +59,7 @@ const CreateVoting = () => {
       gasPrice,
     };
 
-    let gasLimit = await web3.eth.estimateGas(tx);
+    const gasLimit = await web3.eth.estimateGas(tx);
     tx.gas = (gasLimit * 1.5).toFixed(0);
 
     const res = await web3.eth.sendTransaction(tx, (error, transactionHash) => {

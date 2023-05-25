@@ -1,17 +1,17 @@
-import { ReactElement } from "react";
-import { FieldError, Merge } from "react-hook-form";
 import {
   FormControl,
   FormErrorMessage,
   FormHelperText,
   FormLabel,
   forwardRef,
-  Textarea as ChakraTextarea,
   InputAddonProps,
   InputElementProps,
   InputGroup,
+  Textarea as ChakraTextarea,
   TextareaProps as ChakraTextareaProps,
 } from "@chakra-ui/react";
+import { ReactElement } from "react";
+import { FieldError } from "react-hook-form";
 
 export interface InputProps extends ChakraTextareaProps {
   label?: string | JSX.Element;
@@ -65,7 +65,7 @@ export const Textarea = forwardRef<InputProps, "input">((props, ref) => {
       isDisabled={props?.isDisabled}
       flex={flex}
     >
-      {label && <FormLabel>{label}</FormLabel>}
+      {label && <FormLabel marginBottom={1}>{label}</FormLabel>}
       <InputGroup size={size}>
         <ChakraTextarea {...rest} ref={ref} />
       </InputGroup>

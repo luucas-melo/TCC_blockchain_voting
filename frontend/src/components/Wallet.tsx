@@ -1,9 +1,10 @@
-import Link from "next/link";
-import { useListen } from "../hooks/useListen";
-import { useMetamask } from "../hooks/useMetamask";
 import { Button, CircularProgress } from "@chakra-ui/react";
+import Link from "next/link";
 
-export default function Wallet() {
+import { useListen } from "@/hooks/useListen";
+import { useMetamask } from "@/hooks/useMetamask";
+
+export function Wallet() {
   const {
     dispatch,
     state: { status, isMetamaskInstalled, wallet, balance },

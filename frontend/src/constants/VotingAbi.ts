@@ -1,4 +1,5 @@
 import { AbiItem } from "web3-utils";
+
 export const VotingAbi: AbiItem[] = [
   {
     inputs: [
@@ -95,6 +96,25 @@ export const VotingAbi: AbiItem[] = [
     name: "vote",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "key",
+        type: "address",
+      },
+    ],
+    name: "getWhiteList",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {

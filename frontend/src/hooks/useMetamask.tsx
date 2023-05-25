@@ -1,14 +1,18 @@
-import React, { useEffect, type PropsWithChildren } from "react";
+import React, { type PropsWithChildren } from "react";
 
 type ConnectAction = { type: "connect"; wallet: string; balance: string };
+
 type DisconnectAction = { type: "disconnect" };
+
 type PageLoadedAction = {
   type: "pageLoaded";
   isMetamaskInstalled: boolean;
   wallet: string | null;
   balance: string | null;
 };
+
 type LoadingAction = { type: "loading" };
+
 type IdleAction = { type: "idle" };
 
 type Action =
@@ -46,20 +50,27 @@ function metamaskReducer(state: State, action: Action): State {
 
       return newState;
     }
+
     case "disconnect": {
       window.localStorage.removeItem("metamaskState");
+
       if (typeof window.ethereum !== undefined) {
         window.ethereum.removeAllListeners(["accountsChanged"]);
       }
+
       return { ...state, wallet: null, balance: null };
     }
+
     case "pageLoaded": {
       const { isMetamaskInstalled, balance, wallet } = action;
+
       return { ...state, isMetamaskInstalled, status: "idle", wallet, balance };
     }
+
     case "loading": {
       return { ...state, status: "loading" };
     }
+
     case "idle": {
       return { ...state, status: "idle" };
     }
@@ -87,9 +98,11 @@ function MetamaskProvider({ children }: PropsWithChildren) {
 
 function useMetamask() {
   const context = React.useContext(MetamaskContext);
+
   if (context === undefined) {
     throw new Error("useMetamask must be used within a MetamaskProvider");
   }
+
   return context;
 }
 
