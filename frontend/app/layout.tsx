@@ -1,4 +1,6 @@
 // app/layout.tsx
+import { BackButton } from "@/components/BackButton";
+
 import { Providers } from "./providers";
 
 export default function RootLayout({
@@ -10,7 +12,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <main>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <BackButton />
+          </Providers>
         </main>
       </body>
     </html>

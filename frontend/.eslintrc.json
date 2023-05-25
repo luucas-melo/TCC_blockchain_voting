@@ -40,6 +40,7 @@
     // "no-console": "off", // All consoles are automatically removed in production
 
     // import rules
+    "import/extensions": ["warn", "ignorePackages"],
     "import/prefer-default-export": "off",
     "import/no-default-export": "error",
     "simple-import-sort/imports": "warn",
@@ -157,7 +158,7 @@
   "ignorePatterns": ["**/*.json", "**/*.js"],
   "overrides": [
     {
-      "files": ["src/**/*", "__tests__/**/*"],
+      "files": ["*/src/**/*", "__tests__/**/*"],
       "rules": {
         "simple-import-sort/imports": [
           "warn",

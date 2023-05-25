@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
 import { useListen } from "@/hooks/useListen";
@@ -15,10 +14,11 @@ export default function Web3Layout({
 }) {
   const {
     dispatch,
-    state: { isMetamaskInstalled, status, wallet },
+    state: { status, wallet: metamaskWallet },
   } = useMetamask();
 
   const listen = useListen();
+
   useEffect(() => {
     if (typeof window !== undefined) {
       // start by checking if window.ethereum is present, indicating a wallet extension
@@ -45,17 +45,10 @@ export default function Web3Layout({
     }
   }, []);
 
-  const isConnected = status !== "pageNotLoaded" && typeof wallet === "string";
-  const router = useRouter();
+  const isConnected =
+    status !== "pageNotLoaded" && typeof metamaskWallet === "string";
 
-  console.log("isConnected", isConnected, wallet);
-
-  //   useEffect(() => {
-  //     console.log(isConnected);
-  //     if (!isConnected && status !== "loading") {
-  //       router.push("/login");
-  //     }
-  //   }, [isConnected, status]);
+  console.log("isConnected", isConnected);
 
   return (
     <>

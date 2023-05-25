@@ -1,10 +1,13 @@
 // app/providers.tsx
+
 "use client";
 
-import { MetamaskProvider } from "@/hooks/useMetamask";
-import { theme } from "@/theme";
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
+
+import { MetamaskProvider } from "@/hooks/useMetamask";
+
+import { theme } from "../src/theme";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
