@@ -3,51 +3,136 @@
 pragma solidity ^0.8.0;
 
 contract Voting {
+    string public title;
+
     mapping(address => uint) whiteList;
     mapping(address => bool) exists;
-    string public name;
+
     struct Proposal {
         string name;
         uint voteCount;
     }
-
-    address public ElectionCommission;
-
     Proposal[] public proposals;
 
+    uint256 public votingDuration;
+    uint256 public votingStartTime;
+    bool public votingEnded; // Stores whether the voting has ended or not
+    bool public votingStarted; // Stores whether the voting has started or not
+
+    address public electionCommission;
+
     constructor(
-        string memory name_,
-        string[] memory proposalNames,
-        address[] memory whiteList_
+        string memory _title,
+        string[] memory _proposals,
+        address[] memory _whiteList,
+        uint256 duration
     ) {
-        ElectionCommission = msg.sender;
-        name = name_;
-        for (uint i = 0; i < proposalNames.length; i++) {
-            proposals.push(Proposal({name: proposalNames[i], voteCount: 0}));
+        electionCommission = msg.sender;
+        title = _title;
+        votingDuration = duration;
+        votingEnded = false;
+        votingStarted = false;
+
+        for (uint i = 0; i < _proposals.length; i++) {
+            proposals.push(Proposal({name: _proposals[i], voteCount: 0}));
         }
 
-        for (uint i = 0; i < whiteList_.length; i++) {
-            whiteList[whiteList_[i]] = 1;
+        for (uint i = 0; i < _whiteList.length; i++) {
+            whiteList[_whiteList[i]] = 1;
         }
     }
 
-    function addToWhiteList(address voter) public {
+    modifier onlyElectionCommission() {
         require(
-            msg.sender == ElectionCommission,
-            "Only ElectionCommission can give right to vote."
+            msg.sender == electionCommission,
+            "Only Election Commission can give right to vote."
         );
+        _;
+    }
 
+    modifier onlyBeforeStart() {
+        require(votingStarted == false, "Voting has already started.");
+        _;
+    }
+
+    modifier onlyBeforeVotingEnd() {
+        require(
+            block.timestamp < (votingStartTime + votingDuration),
+            "Voting has already ended."
+        );
+        _;
+    }
+
+    modifier onlyAfterVotingEnd() {
+        require(block.timestamp > votingDuration, "Voting has not ended yet.");
+        _;
+    }
+
+    modifier onlyWhiteListed() {
+        require(
+            exists[msg.sender] == true,
+            "You are not allowed to vote in this election."
+        );
+        _;
+    }
+
+    modifier onlyOnce() {
+        require(
+            whiteList[msg.sender] > 0,
+            "You have already voted in this election."
+        );
+        _;
+    }
+
+    function addToWhiteList(
+        address voter
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
         if (exists[voter]) return;
 
         whiteList[voter] = 1;
         exists[voter] = true;
     }
 
-    function vote(uint proposal) public {
-        address voter = msg.sender;
-        require(exists[voter] == true, "You are not allowed to vote");
+    function removeFromWhiteList(
+        address voter
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
+        if (!exists[voter]) return;
 
-        require(whiteList[voter] > 0, "You have already voted");
+        whiteList[voter] = 0;
+        exists[voter] = false;
+    }
+
+    function editProposal(
+        uint proposal,
+        string memory newName
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
+        proposals[proposal].name = newName;
+    }
+
+    function addProposal(
+        string memory newName
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
+        proposals.push(Proposal({name: newName, voteCount: 0}));
+    }
+
+    function editTitle(
+        string memory newTitle
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
+        title = newTitle;
+    }
+
+    function editDeadline(
+        uint256 newDeadline
+    ) public onlyElectionCommission onlyBeforeStart onlyBeforeVotingEnd {
+        votingDuration = newDeadline;
+    }
+
+    function vote(
+        uint proposal
+    ) public onlyWhiteListed onlyBeforeVotingEnd onlyOnce {
+        address voter = msg.sender;
+        // require(exists[voter] == true, "You are not allowed to vote");
+        // require(whiteList[voter] > 0, "You have already voted");
 
         uint voteWeight = whiteList[voter];
 
@@ -55,11 +140,25 @@ contract Voting {
         whiteList[voter] = 0;
     }
 
-    function getWhiteList(address key) public view returns (uint) {
-        return whiteList[key];
+    function getIsWhiteListed(address key) public view returns (bool) {
+        return exists[key];
     }
 
-    function getResult() public view returns (uint winningProposal_) {
+    function startVoting() public onlyElectionCommission onlyBeforeVotingEnd {
+        votingStartTime = block.timestamp;
+        votingStarted = true;
+    }
+
+    function endVoting() public onlyElectionCommission onlyBeforeVotingEnd {
+        votingEnded = true;
+    }
+
+    function getResult()
+        public
+        view
+        onlyAfterVotingEnd
+        returns (uint winningProposal_)
+    {
         uint winningVoteCount = 0;
         for (uint p = 0; p < proposals.length; p++) {
             if (proposals[p].voteCount > winningVoteCount) {

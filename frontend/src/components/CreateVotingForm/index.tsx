@@ -3,17 +3,15 @@ import {
   Card,
   chakra,
   Heading,
+  ToastId,
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
 import { useMetamask } from "@/hooks/useMetamask";
 import { VotingFactoryContract } from "@/lib/contracts";
-import { web3 } from "@/lib/web3";
-import { validateEthereumAddress } from "@/utils/validateEthereumAddress";
 
 import { Input } from "../FormFields/Input";
 import { Textarea } from "../FormFields/Textarea";
@@ -24,62 +22,141 @@ export function CreateVotingForm() {
   } = useMetamask();
 
   const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
 
   const createVoting = useCallback(
-    async ({ name, proposals, whiteList }: Voting) => {
-      if (!wallet) return;
+    async ({ title, proposals, whiteList, deadline }: Voting) => {
+      if (!wallet) return "Wallet not found";
 
-      // const contract = new web3.eth.Contract(
-      //   VotingFactoryAbi,
-      //   votingFactoryAddress
-      // );
+      console.log("deadline", deadline, typeof deadline);
+      const inputConsts = [title, proposals, whiteList, deadline];
 
-      const inputConsts = [name, proposals, whiteList];
+      // const data = VotingFactoryContract.methods
+      //   .deploy(...inputConsts)
+      //   .encodeABI();
 
-      const data = VotingFactoryContract.methods
+      // const gasPrice = await web3.eth.getGasPrice();
+      // const tx = {
+      //   from: wallet,
+      //   data,
+      //   gas: "20000000000", // hard coded for now
+      //   gasPrice,
+      // };
+
+      // const gasLimit = await web3.eth.estimateGas(tx);
+      // tx.gas = (gasLimit * 1.5).toFixed(0);
+
+      const gasLimit = await VotingFactoryContract.methods
         .deploy(...inputConsts)
-        .encodeABI();
-      // Define the gas price and gas limit
-      const gasPrice = await web3.eth.getGasPrice();
-      const tx = {
-        from: wallet,
-        to: votingFactoryAddress,
-        data,
-        gas: "2000000000", // hard coded for now
-        gasPrice,
-      };
+        .estimateGas({ from: wallet });
 
-      const gasLimit = await web3.eth.estimateGas(tx);
-      tx.gas = (gasLimit * 1.5).toFixed(0);
+      console.log("teste", gasLimit);
 
-      await web3.eth.sendTransaction(tx, (error, transactionHash) => {
-        if (error) {
-          console.error(error);
-          toast({
-            status: "error",
-            title: "Erro ao criar votação",
-            description: "Tente novamente mais tarde",
-          });
-        } else {
+      const response = await VotingFactoryContract.methods
+        .deploy(...inputConsts)
+        .send({
+          from: wallet,
+          gas: (gasLimit * 1.5).toFixed(0),
+        })
+        .on("error", (error, receipt) => {
+          console.error("error TESTE:", error);
+          console.log("receipt", receipt);
+
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "error",
+              title: "Erro ao criar votação",
+              description: error?.message
+                ?.split(":")?.[2]
+                ?.replace("revert", ""),
+            });
+        })
+        .on("transactionHash", (transactionHash) => {
           console.log(`Transaction hash: ${transactionHash}`);
-          toast({
-            status: "success",
-            title: "Votação criada com sucesso",
-          });
-        }
-      });
+        })
+        .on("receipt", (receipt) => {
+          console.log("receipt", receipt);
+        })
+        .on("confirmation", (confirmationNumber, receipt) => {
+          console.log("confirmation", confirmationNumber, receipt);
+        });
+      // .then((res) => {
+      //   console.log("res", res);
+
+      //   return res;
+      // })
+      // .catch((err) => {
+      //   console.log("err", err);
+
+      //   return Promise.reject(err);
+      // })
+      // .finally(() => {
+      //   console.log("finally");
+      // });
+
+      console.log("response", response);
+
+      return response;
+
+      // .on("transactionHash", (transactionHash) => {
+      //   console.log(`Transaction hash: ${transactionHash}`);
+      // })
+      // .on("receipt", (receipt) => {
+      //   console.log("receipt", receipt);
+      // })
+      // .on("confirmation", (confirmationNumber, receipt) => {
+      //   console.log("confirmation", confirmationNumber, receipt);
+      // })
+      // .on("error", (error, receipt) => {
+      //   console.error("error TESTE:", error, receipt);
+
+      //   if (toastIdRef.current)
+      //     toast.update(toastIdRef.current, {
+      //       status: "error",
+      //       title: "Erro ao criar votação",
+      //       description: error?.message
+      //         ?.split(":")?.[2]
+      //         ?.replace("revert", ""),
+      //     });
+      // });
     },
     [toast, wallet]
   );
 
   const onSubmit = useCallback(
-    (data: RegisterVoting) => {
-      const name = data?.name;
+    async (data: RegisterVoting) => {
+      const title = data?.title;
       const proposals = data?.proposals.split("\n");
       const whiteList = data?.whiteList.split("\n");
-      createVoting({ name, proposals, whiteList });
+
+      console.log("duration", data?.deadline, typeof data?.deadline);
+      const duration = new Date(data?.deadline);
+      const deadline = Math.floor(duration.getTime() / 1000); // unix timestamp
+
+      try {
+        toastIdRef.current = toast({
+          status: "info",
+          title: "Criando votação",
+          description: "Aguarde enquanto a votação é criada",
+          position: "top",
+        });
+        const res = await createVoting({
+          title,
+          proposals,
+          whiteList,
+          deadline,
+        });
+        console.log("onSubmit res:", res);
+        if (toastIdRef.current)
+          toast.update(toastIdRef.current, {
+            status: "success",
+            title: "Votação criada com sucesso",
+          });
+      } catch (error) {
+        console.error("onSubmit:", error);
+      }
     },
-    [createVoting]
+    [createVoting, toast]
   );
 
   const {
@@ -98,38 +175,49 @@ export function CreateVotingForm() {
           <Input
             label="Título da votação"
             placeholder="Título da votação"
-            {...register("name", {
-              required: "Título da votação é obrigatório",
+            {...register("title", {
+              // required: "Título da votação é obrigatório",
             })}
-            errors={errors.name}
+            errors={errors?.title}
           />
 
           <Textarea
             label="Opções de votação"
             {...register("proposals", {
-              required: "Campo obrigatório",
+              // required: "Campo obrigatório",
             })}
             helperText="Cada opção deve ser separada por uma quebra de linha"
             placeholder="Insira os nomes das opções de votação"
             size="sm"
             rows={6}
-            errors={errors.proposals}
+            errors={errors?.proposals}
             resize="vertical"
           />
 
           <Textarea
             label="Carteiras autorizadas"
             {...register("whiteList", {
-              required: "Campo obrigatório",
-              validate: validateEthereumAddress,
+              // required: "Campo obrigatório",
+              // validate: validateEthereumAddress,
             })}
             helperText="Cada opção deve ser separada por uma quebra de linha"
             placeholder="Insira os endereços das carteiras de quem pode votar"
             size="sm"
             rows={6}
-            errors={errors.whiteList}
+            errors={errors?.whiteList}
             resize="vertical"
           />
+
+          <Input
+            type="datetime-local"
+            label="Duração da votação"
+            placeholder="Duração da votação"
+            {...register("deadline", {
+              required: "Duração da votação é obrigatório",
+            })}
+            errors={errors?.deadline}
+          />
+
           <Button type="submit" width="full" size="lg">
             Criar
           </Button>

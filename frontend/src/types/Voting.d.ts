@@ -1,11 +1,13 @@
 interface Voting {
-  name: string;
+  title: string;
   proposals: string[];
   whiteList: string[];
+  deadline: number;
 }
 
 interface RegisterVoting {
-  name: string;
+  title: string;
   proposals: string;
   whiteList: string;
+  deadline: string;
 }

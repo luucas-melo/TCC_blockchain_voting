@@ -8,25 +8,47 @@ contract VotingFactory {
     event ContractDeployed(address deployedAddress);
 
     function deploy(
-        string memory name,
-        string[] memory proposalNames,
-        address[] memory whiteList_
+        string memory _title,
+        string[] memory _proposals,
+        address[] memory _whiteList,
+        uint256 duration
     ) public {
+        // if (bytes(_title).length == bytes("").length) {
+        //     if (
+        //         keccak256(abi.encodePacked(_title)) ==
+        //         keccak256(abi.encodePacked(""))
+        //     ) {
+        //         revert("Title cannot be empty.");
+        //     }
+        // }
+
         address newContract = address(
-            new Voting(name, proposalNames, whiteList_)
+            new Voting(_title, _proposals, _whiteList, duration)
         );
         deployedContracts.push(newContract);
         emit ContractDeployed(newContract);
     }
 
-    function getDeployedContracts() public view returns (Voting[] memory) {
+    function getDeployedContracts() public view returns (address[] memory) {
+        return deployedContracts;
+    }
+
+    function getVotings() public view returns (Voting[] memory) {
+        address voter = msg.sender;
+
         Voting[] memory votingContracts = new Voting[](
             deployedContracts.length
         );
 
         uint arrayLength = deployedContracts.length;
         for (uint i = 0; i < arrayLength; i++) {
-            votingContracts[i] = Voting(deployedContracts[i]);
+            bool isWhiteListed = Voting(deployedContracts[i]).getIsWhiteListed(
+                voter
+            );
+
+            if (isWhiteListed) {
+                votingContracts[i] = Voting(deployedContracts[i]);
+            } else continue;
         }
 
         return votingContracts;
