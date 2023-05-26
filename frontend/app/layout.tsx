@@ -1,4 +1,3 @@
-// app/layout.tsx
 import { Poppins, Roboto_Flex } from "next/font/google";
 
 import { BackButton } from "@/components/BackButton";
@@ -26,12 +25,26 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${roboto.variable} ${poppins.variable}`}>
       <body>
-        <main>
-          <Providers>
+        <Providers>
+          <main>
+            <BackButton
+              position={{
+                base: "sticky",
+              }}
+              gridColumn={1}
+              gridRow={1}
+              top={[4, 6, 8]}
+              left={[4, 6, 8]}
+              justifySelf="center"
+              variant={{
+                base: "solid",
+                xl: "solid",
+              }}
+              zIndex="sticky"
+            />
             {children}
-            <BackButton />
-          </Providers>
-        </main>
+          </main>
+        </Providers>
       </body>
     </html>
   );

@@ -1,23 +1,22 @@
 "use client";
 
-import { Icon, IconButton } from "@chakra-ui/react";
+import { Icon, IconButton, IconButtonProps } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { TiArrowBack } from "react-icons/ti";
 
-export function BackButton() {
+interface BackButtonProps extends Partial<IconButtonProps> {}
+
+export function BackButton(props: BackButtonProps) {
   const router = useRouter();
 
   return (
     <IconButton
       aria-label="go-back"
-      position="absolute"
-      top={5}
-      right={5}
       onClick={router.back}
-      icon={<Icon as={TiArrowBack} />}
-      variant="outline"
+      icon={<Icon as={TiArrowBack} boxSize={7} />}
       size="md"
-      colorScheme="gray"
+      colorScheme="cyan"
+      {...props}
     />
   );
 }

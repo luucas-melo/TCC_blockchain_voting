@@ -28,7 +28,7 @@ const overrides: Partial<Theme> = {
 
 export const theme = extendTheme(
   overrides,
-  withDefaultColorScheme({ colorScheme: "purple" })
+  withDefaultColorScheme({ colorScheme: "cyan" })
   // withDefaultSize(),
   // withDefaultVariant(),
   // withDefaultProps()

@@ -55,39 +55,34 @@ const Login = () => {
   };
 
   return (
-    <>
-      <h1>AUTH FRONTAL!! DEFAULT!!</h1>
-      <Modal isCentered isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay background="blackAlpha.800" />
-        <ModalContent>
-          <ModalHeader>Authentication</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Text fontSize="lg">
-              Connect in your metamask wallet to continue
-            </Text>
-          </ModalBody>
+    <Modal isCentered isOpen={isOpen} onClose={onClose}>
+      <ModalOverlay background="blackAlpha.800" />
+      <ModalContent>
+        <ModalHeader>Authentication</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+          <Text fontSize="lg">Connect in your metamask wallet to continue</Text>
+        </ModalBody>
 
-          <ModalFooter flexDirection="column" justifyContent="center" gap={6}>
-            {showConnectButton && (
-              <Button
-                isLoading={status === "loading"}
-                size="lg"
-                onClick={handleConnect}
-              >
-                Connect Wallet
-              </Button>
-            )}
-            <Text>
-              Don't have Metamask?{" "}
-              <Link as={NextLink} href="https://metamask.io/" target="_blank">
-                Get Metamask
-              </Link>
-            </Text>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+        <ModalFooter flexDirection="column" justifyContent="center" gap={6}>
+          {showConnectButton && (
+            <Button
+              isLoading={status === "loading"}
+              size="lg"
+              onClick={handleConnect}
+            >
+              Connect Wallet
+            </Button>
+          )}
+          <Text>
+            Don&apos;t have Metamask?{" "}
+            <Link as={NextLink} href="https://metamask.io/" target="_blank">
+              Get Metamask
+            </Link>
+          </Text>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 

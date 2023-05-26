@@ -19,7 +19,16 @@ contract VotingFactory {
         emit ContractDeployed(newContract);
     }
 
-    function getDeployedContracts() public view returns (address[] memory) {
-        return deployedContracts;
+    function getDeployedContracts() public view returns (Voting[] memory) {
+        Voting[] memory votingContracts = new Voting[](
+            deployedContracts.length
+        );
+
+        uint arrayLength = deployedContracts.length;
+        for (uint i = 0; i < arrayLength; i++) {
+            votingContracts[i] = Voting(deployedContracts[i]);
+        }
+
+        return votingContracts;
     }
 }

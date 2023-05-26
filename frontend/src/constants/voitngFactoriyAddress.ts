@@ -1,2 +1,3 @@
-export const votingFactoryAddress =
-  "0xe226f12F2eF7e10060a52726e38241552c97d7D7";
+import json from "../../../blockchain/build/contracts/VotingFactory.json";
+
+export const votingFactoryAddress = Object.entries(json.networks)[0][1].address;
