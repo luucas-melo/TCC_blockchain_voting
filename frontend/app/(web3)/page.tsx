@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Flex } from "@chakra-ui/react";
+import { Button, Grid } from "@chakra-ui/react";
 import Link from "next/link";
 import { useMemo } from "react";
 import useSWR from "swr";
@@ -27,18 +27,20 @@ const Home = () => {
     return addresses.map(VotingContract);
   }, [addresses]);
 
-  console.log(votings?.[0]);
+  console.log("votings ~ votings:", votings);
 
   return (
-    <Flex flexDirection="column" gap={4}>
+    <>
       <Button as={Link} href="/voting/create">
         Create voting
       </Button>
 
-      {votings?.map((contract) => (
-        <VotingCard contract={contract} key={contract?._address} />
-      ))}
-    </Flex>
+      <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
+        {votings?.map((contract) => (
+          <VotingCard contract={contract} key={contract?._address} />
+        ))}
+      </Grid>
+    </>
   );
 };
 

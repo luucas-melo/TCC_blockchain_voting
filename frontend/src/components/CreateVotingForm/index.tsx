@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   chakra,
   Heading,
   ToastId,
@@ -168,61 +167,59 @@ export function CreateVotingForm() {
   });
 
   return (
-    <Card gap={6} width="100%" maxWidth="500px" padding={12}>
-      <chakra.form onSubmit={handleSubmit(onSubmit)}>
-        <VStack align="stretch" spacing={4}>
-          <Heading>Criar votação</Heading>
-          <Input
-            label="Título da votação"
-            placeholder="Título da votação"
-            {...register("title", {
-              // required: "Título da votação é obrigatório",
-            })}
-            errors={errors?.title}
-          />
+    <chakra.form onSubmit={handleSubmit(onSubmit)}>
+      <VStack align="stretch" spacing={4}>
+        <Heading>Criar votação</Heading>
+        <Input
+          label="Título da votação"
+          placeholder="Título da votação"
+          {...register("title", {
+            // required: "Título da votação é obrigatório",
+          })}
+          errors={errors?.title}
+        />
 
-          <Textarea
-            label="Opções de votação"
-            {...register("proposals", {
-              // required: "Campo obrigatório",
-            })}
-            helperText="Cada opção deve ser separada por uma quebra de linha"
-            placeholder="Insira os nomes das opções de votação"
-            size="sm"
-            rows={6}
-            errors={errors?.proposals}
-            resize="vertical"
-          />
+        <Textarea
+          label="Opções de voto"
+          {...register("proposals", {
+            // required: "Campo obrigatório",
+          })}
+          helperText="Cada opção deve ser separada por uma quebra de linha"
+          placeholder="Insira os nomes das opções de voto"
+          size="sm"
+          rows={6}
+          errors={errors?.proposals}
+          resize="vertical"
+        />
 
-          <Textarea
-            label="Carteiras autorizadas"
-            {...register("whiteList", {
-              // required: "Campo obrigatório",
-              // validate: validateEthereumAddress,
-            })}
-            helperText="Cada opção deve ser separada por uma quebra de linha"
-            placeholder="Insira os endereços das carteiras de quem pode votar"
-            size="sm"
-            rows={6}
-            errors={errors?.whiteList}
-            resize="vertical"
-          />
+        <Textarea
+          label="Carteiras autorizadas"
+          {...register("whiteList", {
+            // required: "Campo obrigatório",
+            // validate: validateEthereumAddress,
+          })}
+          helperText="Cada opção deve ser separada por uma quebra de linha"
+          placeholder="Insira os endereços das carteiras de quem pode votar"
+          size="sm"
+          rows={6}
+          errors={errors?.whiteList}
+          resize="vertical"
+        />
 
-          <Input
-            type="datetime-local"
-            label="Duração da votação"
-            placeholder="Duração da votação"
-            {...register("deadline", {
-              required: "Duração da votação é obrigatório",
-            })}
-            errors={errors?.deadline}
-          />
+        <Input
+          type="datetime-local"
+          label="Duração da votação"
+          placeholder="Duração da votação"
+          {...register("deadline", {
+            required: "Duração da votação é obrigatório",
+          })}
+          errors={errors?.deadline}
+        />
 
-          <Button type="submit" width="full" size="lg">
-            Criar
-          </Button>
-        </VStack>
-      </chakra.form>
-    </Card>
+        <Button type="submit" width="full" size="lg">
+          Criar
+        </Button>
+      </VStack>
+    </chakra.form>
   );
 }

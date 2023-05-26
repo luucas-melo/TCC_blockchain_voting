@@ -1,8 +1,23 @@
-import { Button, Card, Heading } from "@chakra-ui/react";
+import {
+  Badge,
+  Box,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Divider,
+  Grid,
+  Heading,
+  Icon,
+  IconButton,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
+import { useMemo } from "react";
+import { SiStackedit } from "react-icons/si";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
-import { Wallet } from "@/components/Wallet";
 import { useMetamask } from "@/hooks/useMetamask";
 
 interface VotingCardProps {
@@ -111,26 +126,108 @@ export function VotingCard({ contract }: VotingCardProps) {
   // }, []);
 
   const getContractData = async () => {
-    const namePromise = contract.methods.name().call();
-    // const proposals = contract.methods.proposals().call();
+    console.log("contract", contract);
+    const titlePromise = contract.methods.title().call() as Promise<string>;
+    const votingDurationPromise = contract.methods
+      .votingDuration()
+      .call() as Promise<string>;
+    const proposalsPromise = contract.methods.getProposals().call() as Promise<
+      string[]
+    >;
 
-    const [name] = await Promise.allSettled([namePromise]);
+    const [title, votingDuration, proposals] = await Promise.allSettled([
+      titlePromise,
+      votingDurationPromise,
+      proposalsPromise,
+    ]);
 
-    return name;
+    console.log("data", title, votingDuration, proposals);
+
+    return {
+      title,
+      votingDuration,
+      proposals,
+    };
   };
 
   const { data, isLoading } = useSWR([contract, "data"], getContractData);
 
-  console.log("teste", data?.status === "fulfilled" && data.value);
+  // console.log("VotingCard ~ data:", data);
+
+  const date = useMemo(() => {
+    if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
+      return "";
+
+    const time = new Date(Number(data.votingDuration.value) * 1000);
+
+    return time.toLocaleString();
+  }, [data]);
 
   return (
-    <>
-      <Card>
-        <Heading>title</Heading>
+    <Box>
+      <Text color="gray.600" fontSize="xs">
+        #{contract?._address}
+      </Text>
+      <Card
+        border="1px solid"
+        boxShadow="lg"
+        backgroundColor="whiteAlpha.500"
+        backdropFilter="blur(48px)"
+      >
+        <CardHeader
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Skeleton isLoaded={!isLoading}>
+            <Heading size="md">
+              {data?.title?.status === "fulfilled" && data?.title?.value}
+            </Heading>
+          </Skeleton>
+
+          <IconButton
+            aria-label="edit"
+            icon={<Icon as={SiStackedit} boxSize={6} />}
+            size="sm"
+            variant="ghost"
+            colorScheme="pink"
+          />
+        </CardHeader>
+
+        <CardBody>
+          <Skeleton isLoaded={!isLoading}>
+            <Text
+              // color="gray.500"
+              fontSize="sm"
+            >
+              Chapa
+            </Text>
+            <Divider mb={1} />
+            <Grid templateColumns="1fr 1fr" justifyItems="start" gap={4}>
+              {data?.proposals?.status === "fulfilled"
+                ? data?.proposals?.value.map((proposal) => (
+                    <Badge fontSize="md" colorScheme="purple" key={proposal}>
+                      {proposal}
+                    </Badge>
+                  ))
+                : null}
+            </Grid>
+          </Skeleton>
+        </CardBody>
+
+        <CardFooter>
+          <Skeleton isLoaded={!isLoading} w="100%">
+            <Text
+              // color="gray.500"
+              fontSize="sm"
+            >
+              Duração
+            </Text>
+            <Divider mb={1} />
+            <Text fontWeight="medium">{date}</Text>
+          </Skeleton>
+        </CardFooter>
       </Card>
-      <Button onClick={add}>Adicionar na white</Button>
-      <Button onClick={vote}>Vote</Button>
-      <Wallet />
-    </>
+    </Box>
   );
 }

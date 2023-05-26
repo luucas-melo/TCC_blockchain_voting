@@ -3,7 +3,13 @@ import type { StyleFunctionProps, Theme } from "@chakra-ui/react";
 
 export const styles: Theme["styles"] = {
   global: (props: StyleFunctionProps) => ({
-    body: {},
+    body: {
+      backgroundImage: "url('/blob-haikei (1).svg')",
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center",
+      backgroundAttachment: "fixed",
+      backgroundSize: "contain",
+    },
     main: {
       // Full Bleed layout
       display: "grid",
@@ -12,7 +18,7 @@ export const styles: Theme["styles"] = {
         "minmax(0, 1fr) min(1024px, calc(100% - (2*var(--chakra-space-6)))) minmax(0, 1fr)",
         "minmax(0, 1fr) min(1024px, calc(100% - (2*var(--chakra-space-8)))) minmax(0, 1fr)",
       ],
-      justifyItems: "center",
+      // justifyItems: "center",
       gap: ["4", "6", "8"],
       minBlockSize: "100vh",
       "> *": {

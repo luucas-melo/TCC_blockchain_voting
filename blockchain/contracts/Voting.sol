@@ -102,6 +102,18 @@ contract Voting {
         exists[voter] = false;
     }
 
+    function getProposals() public view returns (string[] memory) {
+        uint arrayLength = proposals.length;
+
+        string[] memory proposalNames = new string[](arrayLength);
+
+        for (uint i = 0; i < arrayLength; i++) {
+            proposalNames[i] = proposals[i].name;
+        }
+
+        return proposalNames;
+    }
+
     function editProposal(
         uint proposal,
         string memory newName
