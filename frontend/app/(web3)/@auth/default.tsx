@@ -58,13 +58,18 @@ const Login = () => {
     <Modal isCentered isOpen={isOpen} onClose={onClose}>
       <ModalOverlay background="blackAlpha.800" />
       <ModalContent>
-        <ModalHeader>Authentication</ModalHeader>
+        <ModalHeader>Autenticação</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          <Text fontSize="lg">Connect in your metamask wallet to continue</Text>
-        </ModalBody>
-
-        <ModalFooter flexDirection="column" justifyContent="center" gap={6}>
+        <ModalBody
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          gap={6}
+        >
+          <Text fontSize="lg">
+            Acesse a sua carteira Metamask para continuar
+          </Text>
           {showConnectButton && (
             <Button
               isLoading={status === "loading"}
@@ -74,12 +79,15 @@ const Login = () => {
               Connect Wallet
             </Button>
           )}
-          <Text>
-            Don&apos;t have Metamask?{" "}
-            <Link as={NextLink} href="https://metamask.io/" target="_blank">
-              Get Metamask
-            </Link>
+        </ModalBody>
+
+        <ModalFooter justifyContent="center" gap={1}>
+          <Text fontWeight="light" color="gray.600" as="span">
+            Não possui uma carteira Metamask?
           </Text>
+          <Link as={NextLink} href="https://metamask.io/" target="_blank">
+            Obter
+          </Link>
         </ModalFooter>
       </ModalContent>
     </Modal>

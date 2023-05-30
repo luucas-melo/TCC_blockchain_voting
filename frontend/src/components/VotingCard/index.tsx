@@ -165,7 +165,7 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   return (
     <Box>
-      <Text color="gray.600" fontSize="xs">
+      <Text color="gray.400" fontSize="xs">
         #{contract?._address}
       </Text>
       <Card
@@ -198,9 +198,7 @@ export function VotingCard({ contract }: VotingCardProps) {
 
         <CardBody py={0}>
           <Skeleton isLoaded={!isLoading}>
-            <Text color="gray.500" fontSize="sm">
-              Chapa
-            </Text>
+            <Text fontSize="sm">Chapa</Text>
             <Divider mb={1} />
             <Grid templateColumns="1fr 1fr" justifyItems="start" gap={4}>
               {data?.proposals?.status === "fulfilled"
@@ -216,9 +214,7 @@ export function VotingCard({ contract }: VotingCardProps) {
 
         <CardFooter pt={0}>
           <Skeleton isLoaded={!isLoading} w="100%">
-            <Text color="gray.500" fontSize="sm">
-              Duração
-            </Text>
+            <Text fontSize="sm">Duração</Text>
             <Divider mb={1} />
             <Text fontWeight="medium">{date}</Text>
           </Skeleton>
