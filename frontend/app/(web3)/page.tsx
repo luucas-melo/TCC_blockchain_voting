@@ -38,17 +38,6 @@ const Home = () => {
           <Icon as={FaPlus} mr={2} />
           Votação
         </Button>
-
-        <Button
-          as={Link}
-          href="/voting/create"
-          size="lg"
-          boxShadow="2xl"
-          variant="solid"
-        >
-          <Icon as={FaPlus} mr={2} />
-          Votação
-        </Button>
       </Flex>
 
       <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>

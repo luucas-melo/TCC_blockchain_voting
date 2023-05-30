@@ -12,7 +12,8 @@ const gradient = defineStyle((props) => {
   return {
     backgroundImage: mode(
       `linear-gradient(to right, ${colorScheme}.600 0%, ${colorScheme}.400  51%, ${colorScheme}.600  100%)`,
-      `linear-gradient(to right, ${colorScheme}.400 0%, ${colorScheme}.200  51%, ${colorScheme}.400  100%)`
+      // `linear-gradient(to right, ${colorScheme}.500 0%, ${colorScheme}.300  51%, ${colorScheme}.500  100%)`,
+      `linear-gradient(to right, ${colorScheme}.200 0%, ${colorScheme}.300  51%, ${colorScheme}.200  100%)`
     )(props),
 
     color: theme?.components?.Button?.variants?.solid(props)?.color,
@@ -21,9 +22,9 @@ const gradient = defineStyle((props) => {
     //   backgroundImage: `linear-gradient(to right, ${colorScheme}.400 0%, ${colorScheme}.200  51%, ${colorScheme}.400  100%)`,
     // },
 
-    backgroundSize: "225% auto",
-    transition: "0.55s",
-    filter: "contrast(1.1)", // ???
+    backgroundSize: "200% auto",
+    transition: "0.5s",
+    filter: "contrast(1.15)", // ???
 
     "&:hover": {
       backgroundPosition: "right center",

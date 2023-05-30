@@ -48,7 +48,11 @@ export default function Web3Layout({
   const isConnected =
     status !== "pageNotLoaded" && typeof metamaskWallet === "string";
 
+  console.group("Web3");
   console.log("isConnected", isConnected);
+  console.log("wallet", metamaskWallet);
+  console.log("status", status);
+  console.groupEnd();
 
   return (
     <>

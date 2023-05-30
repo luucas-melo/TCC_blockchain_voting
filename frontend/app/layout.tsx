@@ -39,7 +39,10 @@ export default function RootLayout({
             />
             {children}
             <ColorMode
-              position="sticky"
+              position={{
+                base: "fixed",
+                lg: "sticky",
+              }}
               gridColumn={3}
               justifySelf="center"
               alignSelf="end"

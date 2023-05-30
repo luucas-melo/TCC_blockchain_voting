@@ -18,32 +18,29 @@ export const styles: Theme["styles"] = {
       },
 
       backgroundSize: "cover",
-      "&:before": {
-        zIndex: -1,
+
+      "&:before, &:after": {
         content: "''",
         display: "block",
-        backgroundImage: "url(./waves.svg)",
-        backgroundSize: "100% 100%",
-        height: "25vh",
-        width: "100%",
         position: "absolute",
+        width: "100%",
+        backgroundSize: "100% 100%",
+        backgroundRepeat: "no-repeat",
+        zIndex: -1,
+      },
+
+      "&:before": {
+        backgroundImage: "url(./waves.svg)",
+        height: "25vh",
         top: "0px",
         opacity: 0.06,
-        backgroundRepeat: "no-repeat",
         backgroundPosition: "left bottom",
       },
       "&:after": {
-        "z-index": -1,
-        content: "''",
-        display: "block",
         backgroundImage: "url(./waves-2.svg)",
-        backgroundSize: "100% 100%",
         height: "30vh",
-        width: "100%",
-        position: "absolute",
         bottom: "0px",
         opacity: 0.08,
-        backgroundRepeat: "no-repeat",
         backgroundPosition: "right bottom",
       },
     },

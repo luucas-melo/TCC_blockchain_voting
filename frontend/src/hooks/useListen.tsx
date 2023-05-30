@@ -22,5 +22,18 @@ export const useListen = () => {
         dispatch({ type: "disconnect" });
       }
     });
+
+    window.ethereum.on("connect", (connectInfo: { chainId: string }) => {
+      console.log("connectInfo", connectInfo);
+      // dispatch({ type: "connect", chainId: connectInfo.chainId });
+    });
+
+    window.ethereum.on(
+      "disconnect",
+      (error: { code: number; message: string }) => {
+        console.log("disconnect error", error);
+        dispatch({ type: "disconnect" });
+      }
+    );
   };
 };
