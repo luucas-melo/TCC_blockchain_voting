@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Flex, Grid, Heading, VStack } from "@chakra-ui/react";
+import { Button, Flex, Grid, Heading, Icon, VStack } from "@chakra-ui/react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { FaPlus } from "react-icons/fa";
 import useSWR from "swr";
 
 import { VotingCard } from "@/components/VotingCard";
@@ -31,10 +32,22 @@ const Home = () => {
 
   return (
     <VStack align="stretch" gap={8}>
-      <Flex justifyContent="space-between" alignItems="center">
+      <Flex justifyContent="space-between" alignItems="center" wrap="wrap">
         <Heading>Lorem Ipsum Dolor</Heading>
-        <Button as={Link} href="/voting/create" size="lg">
-          Criar Votação
+        <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
+          <Icon as={FaPlus} mr={2} />
+          Votação
+        </Button>
+
+        <Button
+          as={Link}
+          href="/voting/create"
+          size="lg"
+          boxShadow="2xl"
+          variant="solid"
+        >
+          <Icon as={FaPlus} mr={2} />
+          Votação
         </Button>
       </Flex>
 

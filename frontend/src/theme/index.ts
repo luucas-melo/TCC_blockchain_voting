@@ -1,6 +1,8 @@
 import { extendTheme, Theme, withDefaultColorScheme } from "@chakra-ui/react";
 
-import { Form } from "./components/form";
+import { buttonTheme as Button } from "./components/button";
+import { formTheme as Form } from "./components/form";
+import { linkTheme as Link } from "./components/link";
 import { colors } from "./foundations/colors";
 import { fonts } from "./foundations/fonts";
 import { styles } from "./styles";
@@ -20,11 +22,8 @@ const overrides: Partial<Theme> = {
   styles,
   components: {
     Form,
-    Link: {
-      baseStyle: {
-        color: "cyan.700",
-      },
-    },
+    Button,
+    Link,
   } as Theme["components"],
   config: {
     initialColorMode: "dark",
