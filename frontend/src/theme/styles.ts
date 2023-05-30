@@ -4,12 +4,50 @@ import type { StyleFunctionProps, Theme } from "@chakra-ui/react";
 export const styles: Theme["styles"] = {
   global: (props: StyleFunctionProps) => ({
     body: {
-      backgroundImage: "url('/blob-haikei (1).svg')",
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "center",
-      backgroundAttachment: "fixed",
-      backgroundSize: "contain",
+      "background-image": "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+
+      _dark: {
+        "background-image": "linear-gradient(60deg, #29323c 0%, #485563 100%)",
+
+        "&:before": {
+          opacity: 0.45,
+        },
+        "&:after": {
+          opacity: 0.45,
+        },
+      },
+
+      backgroundSize: "cover",
+      "&:before": {
+        "z-index": -1,
+        content: "''",
+        display: "block",
+        "background-image": "url(./waves.svg)",
+        "background-size": "100% 100%",
+        height: "25vh",
+        width: "100%",
+        position: "absolute",
+        top: "0px",
+        opacity: 0.06,
+        "background-repeat": "no-repeat",
+        "background-position": "left bottom",
+      },
+      "&:after": {
+        "z-index": -1,
+        content: "''",
+        display: "block",
+        "background-image": "url(./waves-2.svg)",
+        "background-size": "100% 100%",
+        height: "30vh",
+        width: "100%",
+        position: "absolute",
+        bottom: "0px",
+        opacity: 0.08,
+        "background-repeat": "no-repeat",
+        "background-position": "right bottom",
+      },
     },
+
     main: {
       // Full Bleed layout
       display: "grid",
