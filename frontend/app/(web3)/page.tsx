@@ -42,6 +42,7 @@ const Home = () => {
 
       <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
         {votings?.map((contract) => (
+          // @ts-expect-error
           <VotingCard contract={contract} key={contract?._address} />
         ))}
       </Grid>
