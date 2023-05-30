@@ -1,6 +1,7 @@
 import { Poppins, Roboto_Flex } from "next/font/google";
 
 import { BackButton } from "@/components/BackButton";
+import { ColorMode } from "@/components/ColorMode";
 
 import { Providers } from "./providers";
 
@@ -28,21 +29,24 @@ export default function RootLayout({
         <Providers>
           <main>
             <BackButton
-              position={{
-                base: "sticky",
-              }}
+              position="sticky"
               gridColumn={1}
-              gridRow={1}
-              top={[4, 6, 8]}
-              left={[4, 6, 8]}
+              // gridRow={1}
+              top={5}
+              // left={[4, 6, 8]}
               justifySelf="center"
-              variant={{
-                base: "solid",
-                xl: "solid",
-              }}
               zIndex="sticky"
             />
             {children}
+            <ColorMode
+              position="sticky"
+              gridColumn={3}
+              justifySelf="center"
+              alignSelf="end"
+              bottom={5}
+              // right={5}
+              zIndex="sticky"
+            />
           </main>
         </Providers>
       </body>

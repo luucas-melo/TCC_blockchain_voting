@@ -173,11 +173,13 @@ export function VotingCard({ contract }: VotingCardProps) {
         boxShadow="lg"
         backgroundColor="whiteAlpha.500"
         backdropFilter="blur(48px)"
+        gap={4}
       >
         <CardHeader
           display="flex"
           alignItems="center"
           justifyContent="space-between"
+          pb={0}
         >
           <Skeleton isLoaded={!isLoading}>
             <Heading size="md">
@@ -194,12 +196,9 @@ export function VotingCard({ contract }: VotingCardProps) {
           />
         </CardHeader>
 
-        <CardBody>
+        <CardBody py={0}>
           <Skeleton isLoaded={!isLoading}>
-            <Text
-              // color="gray.500"
-              fontSize="sm"
-            >
+            <Text color="gray.500" fontSize="sm">
               Chapa
             </Text>
             <Divider mb={1} />
@@ -215,12 +214,9 @@ export function VotingCard({ contract }: VotingCardProps) {
           </Skeleton>
         </CardBody>
 
-        <CardFooter>
+        <CardFooter pt={0}>
           <Skeleton isLoaded={!isLoading} w="100%">
-            <Text
-              // color="gray.500"
-              fontSize="sm"
-            >
+            <Text color="gray.500" fontSize="sm">
               Duração
             </Text>
             <Divider mb={1} />

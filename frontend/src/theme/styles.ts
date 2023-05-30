@@ -18,11 +18,13 @@ export const styles: Theme["styles"] = {
         "minmax(0, 1fr) min(1024px, calc(100% - (2*var(--chakra-space-6)))) minmax(0, 1fr)",
         "minmax(0, 1fr) min(1024px, calc(100% - (2*var(--chakra-space-8)))) minmax(0, 1fr)",
       ],
-      // justifyItems: "center",
+      gridTemplateRows: "auto 1fr auto", // padding top/bottom
+      // py: ["4", "6", "8"],
       gap: ["4", "6", "8"],
       minBlockSize: "100vh",
       "> *": {
         gridColumn: 2,
+        gridRow: 2,
       },
     },
   }),

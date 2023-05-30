@@ -15,7 +15,8 @@ export function BackButton(props: BackButtonProps) {
       onClick={router.back}
       icon={<Icon as={TiArrowBack} boxSize={7} />}
       size="md"
-      colorScheme="cyan"
+      colorScheme="gray"
+      variant="solid"
       {...props}
     />
   );

@@ -1,5 +1,6 @@
 import { extendTheme, Theme, withDefaultColorScheme } from "@chakra-ui/react";
 
+import { buttonTheme } from "./components/button";
 import { Form } from "./components/form";
 import { colors } from "./foundations/colors";
 import { fonts } from "./foundations/fonts";
@@ -20,6 +21,7 @@ const overrides: Partial<Theme> = {
   styles,
   components: {
     Form,
+    Button: buttonTheme,
   } as Theme["components"],
   config: {
     initialColorMode: "light",
