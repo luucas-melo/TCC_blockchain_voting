@@ -1,6 +1,5 @@
 import {
   Badge,
-  Box,
   Card,
   CardBody,
   CardFooter,
@@ -17,14 +16,19 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Portal,
   Skeleton,
   Text,
+  ToastId,
+  useColorModeValue,
+  useToast,
+  VStack,
 } from "@chakra-ui/react";
 import type { Route } from "next";
 import { default as NextLink } from "next/link";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { Contract } from "web3-eth-contract";
 
 import { useMetamask } from "@/hooks/useMetamask";
@@ -35,148 +39,104 @@ interface VotingCardProps {
   contract: Contract;
 }
 
+const getContractData = (contract: Contract) => async () => {
+  console.log("contract", contract);
+
+  const electionChiefPromise = contract.methods
+    .electionCommission()
+    .call() as Promise<string>;
+  const titlePromise = contract.methods.title().call() as Promise<string>;
+  const votingDurationPromise = contract.methods
+    .votingDuration()
+    .call() as Promise<string>;
+  const proposalsPromise = contract.methods.getProposals().call() as Promise<
+    string[]
+  >;
+
+  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
+
+  const [title, votingDuration, proposals, isOpen, electionChief] =
+    await Promise.allSettled([
+      titlePromise,
+      votingDurationPromise,
+      proposalsPromise,
+      isOpenPromise,
+      electionChiefPromise,
+    ]);
+
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  console.log("data", title, votingDuration, proposals, isOpen);
+
+  return {
+    title,
+    votingDuration,
+    proposals,
+    isOpen,
+    electionChief,
+  };
+};
+
 export function VotingCard({ contract }: VotingCardProps) {
   const {
-    dispatch,
     state: { wallet },
   } = useMetamask();
 
-  // const listen = useListen();
-  // const web3 = new Web3("ws://localhost:8545");
-  // useEffect(() => {
-  //   if (typeof window !== undefined) {
-  //     // start by checking if window.ethereum is present, indicating a wallet extension
-  //     const ethereumProviderInjected = typeof window.ethereum !== "undefined";
-  //     // this could be other wallets so we can verify if we are dealing with metamask
-  //     // using the boolean constructor to be explecit and not let this be used as a falsy value (optional)
-  //     const isMetamaskInstalled =
-  //       ethereumProviderInjected && Boolean(window.ethereum.isMetaMask);
+  const toast = useToast();
+  const toastIdRef = useRef<ToastId>();
 
-  //     const local = window.localStorage.getItem("metamaskState");
+  const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
-  //     // user was previously connected, start listening to MM
-  //     if (local) {
-  //       listen();
-  //     }
+  const {
+    data,
+    isLoading,
+    mutate: updateContract,
+  } = useSWR(contract?.options?.address, getContractData(contract));
 
-  //     // local could be null if not present in LocalStorage
-  //     const { wallet, balance } = local
-  //       ? JSON.parse(local)
-  //       : // backup if local storage is empty
-  //         { wallet: null, balance: null };
+  const start = useCallback(async () => {
+    toastIdRef.current = toast({
+      status: "info",
+      title: "Iniciando votação",
+      description: "Aguarde a confirmação da transação",
+    });
 
-  //     dispatch({ type: "pageLoaded", isMetamaskInstalled, wallet, balance });
-  //   }
-  // }, []);
+    const gasLimit = await contract.methods.startVoting().estimateGas({
+      from: wallet,
+    });
 
-  // const [contract, setContract] = useState(null);
+    const response = await contract.methods
+      .startVoting()
+      .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
+      .on("error", (error, receipt) => {
+        console.error("error TESTE:", error);
+        console.log("receipt", receipt);
 
-  //   let contractAddress = "0x1f49444De78Bd325C2A3C1C4550fF6BBF5FbEEd1"; // hard coded for now
+        if (toastIdRef.current)
+          toast.update(toastIdRef.current, {
+            status: "error",
+            title: "Erro ao inicar votação",
+            description: error?.message?.split(":")?.[2]?.replace("revert", ""),
+          });
+      })
+      .on("transactionHash", (transactionHash) => {
+        console.log(`Transaction hash: ${transactionHash}`);
+        updateContract();
+        if (toastIdRef.current)
+          toast.update(toastIdRef.current, {
+            status: "success",
+            title: "Votação iniciada!",
+            description: `#${transactionHash}`,
+          });
+      })
+      .on("receipt", (receipt) => {
+        console.log("receipt", receipt);
+      })
+      .on("confirmation", (confirmationNumber, receipt) => {
+        console.log("confirmation", confirmationNumber, receipt);
+      });
 
-  const add = async () => {
-    // if (!wallet) return;
-    // const contract = new web3.eth.Contract(VotingAbi, contractAddress);
-    // const inputConsts = "0xDf3f47571FD69590dA954777562E8751869c9817"; // hard coded for now
-    // const data = contract.methods.addToWhiteList(inputConsts).encodeVotingAbi();
-    // console.log("data", data);
-    // // Define the gas price and gas limit
-    // const gasPrice = await web3.eth.getGasPrice();
-    // console.log("gasPrice", gasPrice);
-    // console.log("wallet", wallet);
-    // const tx = {
-    //   from: wallet,
-    //   to: contractAddress,
-    //   data,
-    //   gas: "2000000000",
-    //   gasPrice,
-    // };
-    // const gasLimit = await web3.eth.estimateGas(tx);
-    // console.log("gasLimit", gasLimit);
-    // tx.gas = (gasLimit * 1.5).toFixed(0);
-    // const res = await web3.eth.sendTransaction(tx, (error, transactionHash) => {
-    //   if (error) {
-    //     console.error(error);
-    //   } else {
-    //     console.log(`Transaction hash: ${transactionHash}`);
-    //   }
-    // });
-  };
-
-  const vote = async () => {
-    // if (!wallet) return;
-    // const contract = new web3.eth.Contract(VotingAbi, contractAddress);
-    // const inputConsts = 1;
-    // const data = contract.methods.vote(inputConsts).encodeVotingAbi();
-    // console.log("data", data);
-    // // Define the gas price and gas limit
-    // const gasPrice = await web3.eth.getGasPrice();
-    // console.log("gasPrice", gasPrice);
-    // console.log("wallet", wallet);
-    // const tx = {
-    //   from: wallet,
-    //   to: contractAddress,
-    //   data,
-    //   gas: "2000000000", // hard coded for now
-    //   gasPrice,
-    // };
-    // const gasLimit = await web3.eth.estimateGas(tx);
-    // console.log("gasLimit", gasLimit);
-    // tx.gas = (gasLimit * 1.5).toFixed(0);
-    // const res = await web3.eth.sendTransaction(tx, (error, transactionHash) => {
-    //   if (error) {
-    //     console.error(error);
-    //   } else {
-    //     console.log(`Transaction hash: ${transactionHash}`);
-    //   }
-    // });
-  };
-
-  // useEffect(() => {
-  //   const c = new web3.eth.Contract(VotingAbi, contractAddress);
-  //   setContract(c);
-  // }, []);
-
-  const getContractData = async () => {
-    console.log("contract", contract);
-
-    const electionChiefPromise = contract.methods
-      .electionCommission()
-      .call() as Promise<string>;
-    const titlePromise = contract.methods.title().call() as Promise<string>;
-    const votingDurationPromise = contract.methods
-      .votingDuration()
-      .call() as Promise<string>;
-    const proposalsPromise = contract.methods.getProposals().call() as Promise<
-      string[]
-    >;
-
-    const isOpenPromise = contract.methods
-      .getIsOpen()
-      .call() as Promise<boolean>;
-
-    const [title, votingDuration, proposals, isOpen, electionChief] =
-      await Promise.allSettled([
-        titlePromise,
-        votingDurationPromise,
-        proposalsPromise,
-        isOpenPromise,
-        electionChiefPromise,
-      ]);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log("data", title, votingDuration, proposals, isOpen);
-
-    return {
-      title,
-      votingDuration,
-      proposals,
-      isOpen,
-      electionChief,
-    };
-  };
-
-  const { data, isLoading } = useSWR([contract, "data"], getContractData);
+    console.log("response", response);
+  }, [contract, mutate, toast, wallet]);
 
   console.log("VotingCard ~ data:", data);
 
@@ -207,7 +167,7 @@ export function VotingCard({ contract }: VotingCardProps) {
   console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
 
   return (
-    <Box>
+    <Flex direction="column">
       <Link
         as={NextLink}
         href={`/voting/${contract?.options?.address}`}
@@ -217,11 +177,13 @@ export function VotingCard({ contract }: VotingCardProps) {
         #{contract?.options?.address}
       </Link>
       <Card
-        border="1px solid"
-        boxShadow="lg"
-        backdropFilter="blur(48px)"
-        borderColor={getPromiseValue("isOpen") ? "green.200" : "red.200"}
+        display="grid"
+        gridTemplateRows="auto 1fr auto"
         gap={4}
+        height="100%"
+        backgroundColor={background}
+        backdropFilter="blur(4px)"
+        boxShadow="lg"
       >
         <CardHeader
           display="flex"
@@ -230,21 +192,30 @@ export function VotingCard({ contract }: VotingCardProps) {
           pb={0}
         >
           <Skeleton isLoaded={!isLoading}>
-            <Heading
-              as={NextLink}
-              href={`/voting/${contract?.options?.address}` as Route}
-              size="md"
-            >
-              {getPromiseValue("title") ?? "Carregando..."}
-            </Heading>
+            <VStack align="start" spacing={1}>
+              <Heading
+                as={NextLink}
+                href={`/voting/${contract?.options?.address}` as Route}
+                size="md"
+              >
+                {getPromiseValue("title") ?? "Carregando..."}
+              </Heading>
+              <Badge
+                variant="solid"
+                colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
+                cursor="default"
+              >
+                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
+              </Badge>
+            </VStack>
           </Skeleton>
 
-          <HStack>
-            <Skeleton isLoaded={!isLoading}>
+          <HStack transform="translateX(4px)">
+            {/* <Skeleton isLoaded={!isLoading}>
               <Badge colorScheme={getPromiseValue("isOpen") ? "green" : "red"}>
                 {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
               </Badge>
-            </Skeleton>
+            </Skeleton> */}
             {!isLoading && (
               <Menu>
                 <MenuButton
@@ -252,20 +223,24 @@ export function VotingCard({ contract }: VotingCardProps) {
                   icon={<Icon as={BsThreeDotsVertical} />}
                   colorScheme="gray"
                 />
-                <MenuList>
-                  <MenuItem>Editar</MenuItem>
-                  <MenuItem>Iniciar</MenuItem>
-                  <MenuDivider />
-                  <MenuItem color="red.400">Cancelar</MenuItem>
-                </MenuList>
+                <Portal>
+                  <MenuList>
+                    <MenuItem>Editar</MenuItem>
+                    <MenuItem onClick={start}>Iniciar</MenuItem>
+                    <MenuDivider />
+                    <MenuItem color="red.400">Cancelar</MenuItem>
+                  </MenuList>
+                </Portal>
               </Menu>
             )}
           </HStack>
         </CardHeader>
 
         <CardBody py={0}>
-          <Text fontSize="sm">Chapa</Text>
-          <Divider mb={1} />
+          <Text fontSize="sm" cursor="default">
+            Chapa
+          </Text>
+          <Divider mb={2} />
 
           {isLoading && (
             <Flex justifyContent="space-between">
@@ -274,9 +249,15 @@ export function VotingCard({ contract }: VotingCardProps) {
             </Flex>
           )}
           <Skeleton isLoaded={!isLoading}>
-            <Grid templateColumns="1fr 1fr" justifyItems="start" gap={4}>
+            <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
               {getPromiseValue("proposals")?.map?.((proposal) => (
-                <Badge fontSize="md" colorScheme="purple" key={proposal}>
+                <Badge
+                  fontSize="md"
+                  variant="outline"
+                  colorScheme="gray"
+                  textTransform="capitalize"
+                  key={proposal}
+                >
                   {proposal}
                 </Badge>
               ))}
@@ -285,13 +266,15 @@ export function VotingCard({ contract }: VotingCardProps) {
         </CardBody>
 
         <CardFooter pt={0} flexDirection="column">
-          <Text fontSize="sm">Duração</Text>
+          <Text fontSize="sm" cursor="default">
+            Duração
+          </Text>
           <Divider mb={1} />
           <Skeleton isLoaded={!isLoading} w="75%" height="24px">
             <Text fontWeight="medium">{date ?? "Loading..."}</Text>
           </Skeleton>
         </CardFooter>
       </Card>
-    </Box>
+    </Flex>
   );
 }

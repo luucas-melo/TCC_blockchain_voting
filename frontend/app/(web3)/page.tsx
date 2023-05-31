@@ -1,8 +1,18 @@
 "use client";
 
-import { Button, Flex, Grid, Heading, Icon, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Divider,
+  Flex,
+  Grid,
+  Heading,
+  Icon,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FaPlus } from "react-icons/fa";
 import useSWR from "swr";
 
@@ -23,6 +33,7 @@ const Home = () => {
       const res = await VotingFactoryContract.methods.getVotings().call({
         from: wallet,
       });
+
       return res;
     }
   );
@@ -56,7 +67,12 @@ const Home = () => {
   return (
     <VStack align="stretch" gap={8}>
       <Flex justifyContent="space-between" alignItems="center" wrap="wrap">
-        <Heading>Minhas Votações</Heading>
+        <Box>
+          <Heading>Minhas Votações</Heading>
+          <Text>
+            {votings?.length} votaç{votings?.length !== 1 ? "ões" : "ão"}
+          </Text>
+        </Box>
         <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
           <Icon as={FaPlus} mr={2} />
           Votação
@@ -70,12 +86,13 @@ const Home = () => {
       </Grid>
 
       <Heading size="lg">Todas as votações</Heading>
+      <Divider />
 
       <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
         {allVotings?.map((contract) => (
           <VotingCard
             contract={contract}
-            key={contract?.options?.address + "allVotings"}
+            key={`${contract?.options?.address}allVotings`}
           />
         ))}
       </Grid>

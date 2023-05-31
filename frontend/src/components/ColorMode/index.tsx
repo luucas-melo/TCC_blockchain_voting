@@ -13,7 +13,7 @@ export function ColorMode(props: ColorModeProps) {
       aria-label="color-mode"
       onClick={toggleColorMode}
       variant={colorMode === "light" ? "solid" : "outline"}
-      colorScheme={colorMode === "light" ? "gray" : "cyan"}
+      // colorScheme={colorMode === "light" ? "gray" : "cyan"}
       {...props}
     >
       {colorMode === "light" ? <BsFillMoonFill /> : <BsFillSunFill />}

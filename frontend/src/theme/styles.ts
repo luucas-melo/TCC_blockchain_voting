@@ -5,9 +5,13 @@ export const styles: Theme["styles"] = {
   global: (props: StyleFunctionProps) => ({
     body: {
       backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+      backgroundSize: "cover",
+      // backgroundAttachment: "fixed",
 
       _dark: {
-        backgroundImage: "linear-gradient(60deg, #29323c 0%, #485563 100%)",
+        // backgroundImage: "linear-gradient(-20deg, #2b5876 0%, #4e4376 100%)",
+
+        background: "#1e2028",
 
         "&:before": {
           opacity: 0.45,
@@ -17,12 +21,10 @@ export const styles: Theme["styles"] = {
         },
       },
 
-      backgroundSize: "cover",
-
       "&:before, &:after": {
         content: "''",
         display: "block",
-        position: "absolute",
+        position: "fixed",
         width: "100%",
         backgroundSize: "100% 100%",
         backgroundRepeat: "no-repeat",
@@ -47,6 +49,7 @@ export const styles: Theme["styles"] = {
 
     main: {
       // Full Bleed layout
+      backgroundAttachment: "fixed",
       display: "grid",
       gridTemplateColumns: [
         "minmax(0, 1fr) min(1024px, calc(100% - (2*var(--chakra-space-4)))) minmax(0, 1fr)",
