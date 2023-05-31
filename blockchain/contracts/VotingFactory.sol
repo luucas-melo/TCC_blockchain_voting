@@ -33,24 +33,31 @@ contract VotingFactory {
         return deployedContracts;
     }
 
-    function getVotings() public view returns (Voting[] memory) {
+    function getVotings() public view returns (address[] memory) {
+        // Best Gas costs
         address voter = msg.sender;
 
-        Voting[] memory votingContracts = new Voting[](
+        address[] memory votingContracts = new address[](
             deployedContracts.length
         );
+        uint validCount = 0;
 
-        uint arrayLength = deployedContracts.length;
-        for (uint i = 0; i < arrayLength; i++) {
-            bool isWhiteListed = Voting(deployedContracts[i]).getIsWhiteListed(
-                voter
-            );
-
-            if (isWhiteListed) {
-                votingContracts[i] = Voting(deployedContracts[i]);
-            } else continue;
+        for (uint i = 0; i < deployedContracts.length; i++) {
+            bool exists = Voting(deployedContracts[i]).getIsWhiteListed(voter);
+            if (exists) {
+                votingContracts[validCount] = deployedContracts[i];
+                validCount++;
+            }
         }
 
-        return votingContracts;
+        // Create a new array with the correct length
+        address[] memory result = new address[](validCount);
+
+        // Copy the valid contracts to the new array
+        for (uint i = 0; i < validCount; i++) {
+            result[i] = votingContracts[i];
+        }
+
+        return result;
     }
 }

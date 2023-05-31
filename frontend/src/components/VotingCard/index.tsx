@@ -135,13 +135,15 @@ export function VotingCard({ contract }: VotingCardProps) {
       string[]
     >;
 
-    const [title, votingDuration, proposals] = await Promise.allSettled([
-      titlePromise,
-      votingDurationPromise,
-      proposalsPromise,
-    ]);
+    const existsPromise = contract.methods
+      .getIsWhiteListed(wallet)
+      .call() as Promise<boolean>;
 
-    console.log("data", title, votingDuration, proposals);
+    const [title, votingDuration, proposals, exists] = await Promise.allSettled(
+      [titlePromise, votingDurationPromise, proposalsPromise, existsPromise]
+    );
+
+    console.log("data", title, votingDuration, proposals, exists);
 
     return {
       title,
@@ -171,7 +173,7 @@ export function VotingCard({ contract }: VotingCardProps) {
       <Card
         border="1px solid"
         boxShadow="lg"
-        backgroundColor="whiteAlpha.500"
+        // backgroundColor="whiteAlpha.500"
         backdropFilter="blur(48px)"
         gap={4}
       >

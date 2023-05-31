@@ -39,6 +39,7 @@ contract Voting {
 
         for (uint i = 0; i < _whiteList.length; i++) {
             whiteList[_whiteList[i]] = 1;
+            exists[_whiteList[i]] = true;
         }
     }
 
@@ -82,6 +83,10 @@ contract Voting {
             "You have already voted in this election."
         );
         _;
+    }
+
+    function getExists(address key) public view returns (bool) {
+        return exists[key];
     }
 
     function addToWhiteList(
@@ -152,7 +157,7 @@ contract Voting {
         whiteList[voter] = 0;
     }
 
-    function getIsWhiteListed(address key) public view returns (bool) {
+    function getIsWhiteListed(address key) external view returns (bool) {
         return exists[key];
     }
 
@@ -166,7 +171,7 @@ contract Voting {
     }
 
     function getResult()
-        public
+        external
         view
         onlyAfterVotingEnd
         returns (uint winningProposal_)
