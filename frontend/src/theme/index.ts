@@ -32,7 +32,7 @@ const overrides: Partial<Theme> = {
 
 export const theme = extendTheme(
   overrides,
-  withDefaultColorScheme({ colorScheme: "pink" })
+  withDefaultColorScheme({ colorScheme: "cyan" })
   // withDefaultSize(),
   // withDefaultVariant(),
   // withDefaultProps()

@@ -28,7 +28,7 @@ import type { Route } from "next";
 import { default as NextLink } from "next/link";
 import { useCallback, useMemo, useRef } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
 import { useMetamask } from "@/hooks/useMetamask";
@@ -100,43 +100,56 @@ export function VotingCard({ contract }: VotingCardProps) {
       description: "Aguarde a confirmação da transação",
     });
 
-    const gasLimit = await contract.methods.startVoting().estimateGas({
-      from: wallet,
-    });
-
-    const response = await contract.methods
-      .startVoting()
-      .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-      .on("error", (error, receipt) => {
-        console.error("error TESTE:", error);
-        console.log("receipt", receipt);
-
-        if (toastIdRef.current)
-          toast.update(toastIdRef.current, {
-            status: "error",
-            title: "Erro ao inicar votação",
-            description: error?.message?.split(":")?.[2]?.replace("revert", ""),
-          });
-      })
-      .on("transactionHash", (transactionHash) => {
-        console.log(`Transaction hash: ${transactionHash}`);
-        updateContract();
-        if (toastIdRef.current)
-          toast.update(toastIdRef.current, {
-            status: "success",
-            title: "Votação iniciada!",
-            description: `#${transactionHash}`,
-          });
-      })
-      .on("receipt", (receipt) => {
-        console.log("receipt", receipt);
-      })
-      .on("confirmation", (confirmationNumber, receipt) => {
-        console.log("confirmation", confirmationNumber, receipt);
+    try {
+      const gasLimit = await contract.methods.startVoting().estimateGas({
+        from: wallet,
       });
 
-    console.log("response", response);
-  }, [contract, mutate, toast, wallet]);
+      const response = await contract.methods
+        .startVoting()
+        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
+        .on("error", (error, receipt) => {
+          console.error("error TESTE:", error);
+          console.log("receipt", receipt);
+
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "error",
+              title: "Erro ao inicar votação",
+              description: error?.message
+                ?.split(":")?.[2]
+                ?.replace("revert", ""),
+            });
+        })
+        .on("transactionHash", (transactionHash) => {
+          console.log(`Transaction hash: ${transactionHash}`);
+          updateContract();
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "success",
+              title: "Votação iniciada!",
+              description: `#${transactionHash}`,
+            });
+        })
+        .on("receipt", (receipt) => {
+          console.log("receipt", receipt);
+        })
+        .on("confirmation", (confirmationNumber, receipt) => {
+          console.log("confirmation", confirmationNumber, receipt);
+        });
+
+      console.log("response", response);
+    } catch (e) {
+      console.log("error estimateGas", e);
+
+      if (toastIdRef.current)
+        toast.update(toastIdRef.current, {
+          status: "error",
+          title: "Erro ao inicar votação",
+          description: (e as Error)?.message,
+        });
+    }
+  }, [contract, toast, updateContract, wallet]);
 
   console.log("VotingCard ~ data:", data);
 

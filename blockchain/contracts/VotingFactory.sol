@@ -5,7 +5,8 @@ import {Voting} from "./Voting.sol";
 
 contract VotingFactory {
     address[] public deployedContracts;
-    event ContractDeployed(address deployedAddress);
+
+    // event ContractDeployed(address deployedAddress);
 
     function deploy(
         string memory _title,
@@ -33,7 +34,7 @@ contract VotingFactory {
             )
         );
         deployedContracts.push(newContract);
-        emit ContractDeployed(newContract);
+        // emit ContractDeployed(newContract);
     }
 
     function getDeployedContracts() public view returns (address[] memory) {
