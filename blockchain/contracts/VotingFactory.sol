@@ -22,8 +22,15 @@ contract VotingFactory {
         //     }
         // }
 
+        address electionCommission = msg.sender;
         address newContract = address(
-            new Voting(_title, _proposals, _whiteList, duration)
+            new Voting(
+                electionCommission,
+                _title,
+                _proposals,
+                _whiteList,
+                duration
+            )
         );
         deployedContracts.push(newContract);
         emit ContractDeployed(newContract);

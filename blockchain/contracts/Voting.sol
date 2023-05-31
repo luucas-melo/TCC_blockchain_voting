@@ -22,12 +22,13 @@ contract Voting {
     address public electionCommission;
 
     constructor(
+        address _electionCommission,
         string memory _title,
         string[] memory _proposals,
         address[] memory _whiteList,
         uint256 duration
     ) {
-        electionCommission = msg.sender;
+        electionCommission = _electionCommission;
         title = _title;
         votingDuration = duration;
         votingEnded = false;
@@ -168,6 +169,10 @@ contract Voting {
 
     function endVoting() public onlyElectionCommission onlyBeforeVotingEnd {
         votingEnded = true;
+    }
+
+    function getIsOpen() public view returns (bool) {
+        return votingEnded == false && votingStarted == true;
     }
 
     function getResult()

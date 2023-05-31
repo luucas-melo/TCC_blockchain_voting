@@ -6,19 +6,30 @@ import {
   CardFooter,
   CardHeader,
   Divider,
+  Flex,
   Grid,
   Heading,
+  HStack,
   Icon,
-  IconButton,
+  Link,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
   Skeleton,
   Text,
 } from "@chakra-ui/react";
-import { useMemo } from "react";
-import { SiStackedit } from "react-icons/si";
+import type { Route } from "next";
+import { default as NextLink } from "next/link";
+import { useCallback, useMemo } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
 import { useMetamask } from "@/hooks/useMetamask";
+
+import { ActionButton } from "../ActionButton";
 
 interface VotingCardProps {
   contract: Contract;
@@ -127,6 +138,10 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   const getContractData = async () => {
     console.log("contract", contract);
+
+    const electionChiefPromise = contract.methods
+      .electionCommission()
+      .call() as Promise<string>;
     const titlePromise = contract.methods.title().call() as Promise<string>;
     const votingDurationPromise = contract.methods
       .votingDuration()
@@ -135,26 +150,35 @@ export function VotingCard({ contract }: VotingCardProps) {
       string[]
     >;
 
-    const existsPromise = contract.methods
-      .getIsWhiteListed(wallet)
+    const isOpenPromise = contract.methods
+      .getIsOpen()
       .call() as Promise<boolean>;
 
-    const [title, votingDuration, proposals, exists] = await Promise.allSettled(
-      [titlePromise, votingDurationPromise, proposalsPromise, existsPromise]
-    );
+    const [title, votingDuration, proposals, isOpen, electionChief] =
+      await Promise.allSettled([
+        titlePromise,
+        votingDurationPromise,
+        proposalsPromise,
+        isOpenPromise,
+        electionChiefPromise,
+      ]);
 
-    console.log("data", title, votingDuration, proposals, exists);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    console.log("data", title, votingDuration, proposals, isOpen);
 
     return {
       title,
       votingDuration,
       proposals,
+      isOpen,
+      electionChief,
     };
   };
 
   const { data, isLoading } = useSWR([contract, "data"], getContractData);
 
-  // console.log("VotingCard ~ data:", data);
+  console.log("VotingCard ~ data:", data);
 
   const date = useMemo(() => {
     if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
@@ -165,16 +189,38 @@ export function VotingCard({ contract }: VotingCardProps) {
     return time.toLocaleString();
   }, [data]);
 
+  const getPromiseValue = useCallback(
+    (dataKey: string) => {
+      if (!data) return undefined;
+
+      type DataKeys = keyof typeof data;
+
+      if (data[dataKey as DataKeys].status === "fulfilled")
+        return (data[dataKey as DataKeys] as PromiseFulfilledResult<string[]>)
+          .value;
+
+      return null;
+    },
+    [data]
+  );
+
+  console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
+
   return (
     <Box>
-      <Text color="gray.400" fontSize="xs">
-        #{contract?._address}
-      </Text>
+      <Link
+        as={NextLink}
+        href={`/voting/${contract?.options?.address}`}
+        color="gray.400"
+        fontSize="xs"
+      >
+        #{contract?.options?.address}
+      </Link>
       <Card
         border="1px solid"
         boxShadow="lg"
-        // backgroundColor="whiteAlpha.500"
         backdropFilter="blur(48px)"
+        borderColor={getPromiseValue("isOpen") ? "green.200" : "red.200"}
         gap={4}
       >
         <CardHeader
@@ -184,41 +230,65 @@ export function VotingCard({ contract }: VotingCardProps) {
           pb={0}
         >
           <Skeleton isLoaded={!isLoading}>
-            <Heading size="md">
-              {data?.title?.status === "fulfilled" && data?.title?.value}
+            <Heading
+              as={NextLink}
+              href={`/voting/${contract?.options?.address}` as Route}
+              size="md"
+            >
+              {getPromiseValue("title") ?? "Carregando..."}
             </Heading>
           </Skeleton>
 
-          <IconButton
-            aria-label="edit"
-            icon={<Icon as={SiStackedit} boxSize={6} />}
-            size="sm"
-            variant="ghost"
-            colorScheme="pink"
-          />
+          <HStack>
+            <Skeleton isLoaded={!isLoading}>
+              <Badge colorScheme={getPromiseValue("isOpen") ? "green" : "red"}>
+                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
+              </Badge>
+            </Skeleton>
+            {!isLoading && (
+              <Menu>
+                <MenuButton
+                  as={ActionButton}
+                  icon={<Icon as={BsThreeDotsVertical} />}
+                  colorScheme="gray"
+                />
+                <MenuList>
+                  <MenuItem>Editar</MenuItem>
+                  <MenuItem>Iniciar</MenuItem>
+                  <MenuDivider />
+                  <MenuItem color="red.400">Cancelar</MenuItem>
+                </MenuList>
+              </Menu>
+            )}
+          </HStack>
         </CardHeader>
 
         <CardBody py={0}>
+          <Text fontSize="sm">Chapa</Text>
+          <Divider mb={1} />
+
+          {isLoading && (
+            <Flex justifyContent="space-between">
+              <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
+              <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
+            </Flex>
+          )}
           <Skeleton isLoaded={!isLoading}>
-            <Text fontSize="sm">Chapa</Text>
-            <Divider mb={1} />
             <Grid templateColumns="1fr 1fr" justifyItems="start" gap={4}>
-              {data?.proposals?.status === "fulfilled"
-                ? data?.proposals?.value.map((proposal) => (
-                    <Badge fontSize="md" colorScheme="purple" key={proposal}>
-                      {proposal}
-                    </Badge>
-                  ))
-                : null}
+              {getPromiseValue("proposals")?.map?.((proposal) => (
+                <Badge fontSize="md" colorScheme="purple" key={proposal}>
+                  {proposal}
+                </Badge>
+              ))}
             </Grid>
           </Skeleton>
         </CardBody>
 
-        <CardFooter pt={0}>
-          <Skeleton isLoaded={!isLoading} w="100%">
-            <Text fontSize="sm">Duração</Text>
-            <Divider mb={1} />
-            <Text fontWeight="medium">{date}</Text>
+        <CardFooter pt={0} flexDirection="column">
+          <Text fontSize="sm">Duração</Text>
+          <Divider mb={1} />
+          <Skeleton isLoaded={!isLoading} w="75%" height="24px">
+            <Text fontWeight="medium">{date ?? "Loading..."}</Text>
           </Skeleton>
         </CardFooter>
       </Card>
