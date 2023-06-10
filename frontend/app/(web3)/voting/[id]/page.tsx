@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Avatar,
   Badge,
   Box,
   Card,
@@ -26,6 +27,7 @@ import {
   useColorModeValue,
   useToast,
   VStack,
+  WrapItem,
 } from "@chakra-ui/react";
 import type { Route } from "next";
 import { default as NextLink } from "next/link";
@@ -65,19 +67,19 @@ const getContractData = (contract: Contract) => async () => {
 
   const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
 
-  const [title, votingDuration, proposals, isOpen, electionChief, whiteList] =
+  const [title, votingDuration, whiteList, proposals, isOpen, electionChief] =
     await Promise.allSettled([
       titlePromise,
       votingDurationPromise,
+      whiteListPromise,
       proposalsPromise,
       isOpenPromise,
       electionChiefPromise,
-      whiteListPromise,
     ]);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  console.log("data", title, votingDuration, proposals, isOpen);
+  console.log("data", title, votingDuration, proposals, isOpen, whiteList);
 
   return {
     title,
@@ -105,7 +107,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
     data,
     isLoading,
     mutate: updateContract,
-  } = useSWR(contract?.options?.address, getContractData(contract));
+  } = useSWR(`own-${contract?.options?.address}`, getContractData(contract));
 
   const start = useCallback(async () => {
     toastIdRef.current = toast({
@@ -180,7 +182,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
 
       type DataKeys = keyof typeof data;
 
-      if (data[dataKey as DataKeys].status === "fulfilled")
+      if (data?.[dataKey as DataKeys]?.status === "fulfilled")
         return (data[dataKey as DataKeys] as PromiseFulfilledResult<string[]>)
           .value;
 
@@ -188,8 +190,6 @@ export default function VotingPage({ params }: { params: { id: string } }) {
     },
     [data]
   );
-
-  console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
 
   return (
     <Flex direction="column">
@@ -241,6 +241,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                 {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
               </Badge>
             </Skeleton> */}
+
             {!isLoading && (
               <Menu>
                 <MenuButton
@@ -269,25 +270,35 @@ export default function VotingPage({ params }: { params: { id: string } }) {
             <Divider mb={2} />
 
             {isLoading && (
-              <Flex justifyContent="space-between">
-                <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
-                <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
+              <Flex gap={8}>
+                <Skeleton isLoaded={!isLoading} w="20%" height="112px" />
+                <Skeleton isLoaded={!isLoading} w="20%" height="112px" />
               </Flex>
             )}
             <Skeleton isLoaded={!isLoading}>
-              <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
+              <Flex gap={8}>
                 {getPromiseValue("proposals")?.map?.((proposal) => (
-                  <Badge
-                    fontSize="md"
-                    variant="outline"
-                    colorScheme="gray"
-                    textTransform="capitalize"
+                  <Card
                     key={proposal}
+                    boxShadow="sm"
+                    _hover={{
+                      boxShadow: "md",
+                      cursor: "pointer",
+                    }}
+                    display="flex"
+                    flexDirection="column"
+                    align="center"
+                    py={4}
+                    px={10}
+                    gap={2}
                   >
-                    {proposal}
-                  </Badge>
+                    <WrapItem>
+                      <Avatar name={proposal} />
+                    </WrapItem>
+                    <Text fontWeight="medium">{proposal}</Text>
+                  </Card>
                 ))}
-              </Grid>
+              </Flex>
             </Skeleton>
           </Box>
           <Box>
@@ -304,15 +315,15 @@ export default function VotingPage({ params }: { params: { id: string } }) {
             )}
             <Skeleton isLoaded={!isLoading}>
               <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
-                {getPromiseValue("whiteList")?.map?.((proposal) => (
+                {getPromiseValue("whiteList")?.map?.((address) => (
                   <Badge
                     fontSize="md"
                     variant="outline"
                     colorScheme="gray"
                     textTransform="capitalize"
-                    key={proposal}
+                    key={address}
                   >
-                    {proposal}
+                    {address}
                   </Badge>
                 ))}
               </Grid>

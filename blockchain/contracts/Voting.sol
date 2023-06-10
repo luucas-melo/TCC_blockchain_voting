@@ -133,7 +133,7 @@ contract Voting {
             addresses[i] = whiteListedAddresses[i];
         }
 
-        return whiteListedAddresses;
+        return addresses;
     }
 
     function editProposal(

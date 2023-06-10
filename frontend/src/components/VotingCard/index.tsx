@@ -6,7 +6,6 @@ import {
   CardHeader,
   Divider,
   Flex,
-  Grid,
   Heading,
   HStack,
   Icon,
@@ -177,7 +176,7 @@ export function VotingCard({ contract }: VotingCardProps) {
     [data]
   );
 
-  console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
+  // console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
 
   return (
     <Flex direction="column">
@@ -262,7 +261,7 @@ export function VotingCard({ contract }: VotingCardProps) {
             </Flex>
           )}
           <Skeleton isLoaded={!isLoading}>
-            <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
+            <Flex flexWrap="wrap" gap={4}>
               {getPromiseValue("proposals")?.map?.((proposal) => (
                 <Badge
                   fontSize="md"
@@ -274,7 +273,7 @@ export function VotingCard({ contract }: VotingCardProps) {
                   {proposal}
                 </Badge>
               ))}
-            </Grid>
+            </Flex>
           </Skeleton>
         </CardBody>
 
