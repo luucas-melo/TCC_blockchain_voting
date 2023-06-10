@@ -18,19 +18,18 @@ import {
   Portal,
   Skeleton,
   Text,
-  ToastId,
   useColorModeValue,
-  useToast,
   VStack,
 } from "@chakra-ui/react";
 import type { Route } from "next";
 import { default as NextLink } from "next/link";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
-import { useMetamask } from "@/hooks/useMetamask";
+import { useVoting } from "@/hooks/useVoting";
+import { getContractData } from "@/lib/contracts";
 
 import { ActionButton } from "../ActionButton";
 
@@ -38,52 +37,7 @@ interface VotingCardProps {
   contract: Contract;
 }
 
-const getContractData = (contract: Contract) => async () => {
-  console.log("contract", contract);
-
-  const electionChiefPromise = contract.methods
-    .electionCommission()
-    .call() as Promise<string>;
-  const titlePromise = contract.methods.title().call() as Promise<string>;
-  const votingDurationPromise = contract.methods
-    .votingDuration()
-    .call() as Promise<string>;
-  const proposalsPromise = contract.methods.getProposals().call() as Promise<
-    string[]
-  >;
-
-  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
-
-  const [title, votingDuration, proposals, isOpen, electionChief] =
-    await Promise.allSettled([
-      titlePromise,
-      votingDurationPromise,
-      proposalsPromise,
-      isOpenPromise,
-      electionChiefPromise,
-    ]);
-
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  console.log("data", title, votingDuration, proposals, isOpen);
-
-  return {
-    title,
-    votingDuration,
-    proposals,
-    isOpen,
-    electionChief,
-  };
-};
-
 export function VotingCard({ contract }: VotingCardProps) {
-  const {
-    state: { wallet },
-  } = useMetamask();
-
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
-
   const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
   const {
@@ -92,63 +46,7 @@ export function VotingCard({ contract }: VotingCardProps) {
     mutate: updateContract,
   } = useSWR(contract?.options?.address, getContractData(contract));
 
-  const start = useCallback(async () => {
-    toastIdRef.current = toast({
-      status: "info",
-      title: "Iniciando votação",
-      description: "Aguarde a confirmação da transação",
-    });
-
-    try {
-      const gasLimit = await contract.methods.startVoting().estimateGas({
-        from: wallet,
-      });
-
-      const response = await contract.methods
-        .startVoting()
-        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-        .on("error", (error, receipt) => {
-          console.error("error TESTE:", error);
-          console.log("receipt", receipt);
-
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "error",
-              title: "Erro ao inicar votação",
-              description: error?.message
-                ?.split(":")?.[2]
-                ?.replace("revert", ""),
-            });
-        })
-        .on("transactionHash", (transactionHash) => {
-          console.log(`Transaction hash: ${transactionHash}`);
-          updateContract();
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "success",
-              title: "Votação iniciada!",
-              description: `#${transactionHash}`,
-            });
-        })
-        .on("receipt", (receipt) => {
-          console.log("receipt", receipt);
-        })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
-        });
-
-      console.log("response", response);
-    } catch (e) {
-      console.log("error estimateGas", e);
-
-      if (toastIdRef.current)
-        toast.update(toastIdRef.current, {
-          status: "error",
-          title: "Erro ao inicar votação",
-          description: (e as Error)?.message,
-        });
-    }
-  }, [contract, toast, updateContract, wallet]);
+  const { startVoting } = useVoting(contract, updateContract);
 
   console.log("VotingCard ~ data:", data);
 
@@ -238,7 +136,7 @@ export function VotingCard({ contract }: VotingCardProps) {
                 <Portal>
                   <MenuList>
                     <MenuItem>Editar</MenuItem>
-                    <MenuItem onClick={start}>Iniciar</MenuItem>
+                    <MenuItem onClick={startVoting}>Iniciar</MenuItem>
                     <MenuDivider />
                     <MenuItem color="red.400">Cancelar</MenuItem>
                   </MenuList>

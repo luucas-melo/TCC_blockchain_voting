@@ -73,6 +73,11 @@ contract Voting {
         _;
     }
 
+    modifier OnlyAfterVotingStart() {
+        require(votingStarted == true, "Voting has not started yet.");
+        _;
+    }
+
     modifier onlyWhiteListed() {
         require(
             exists[msg.sender] == true,
@@ -163,7 +168,7 @@ contract Voting {
 
     function vote(
         uint proposal
-    ) public onlyWhiteListed onlyBeforeVotingEnd onlyOnce {
+    ) public OnlyAfterVotingStart onlyWhiteListed onlyBeforeVotingEnd onlyOnce {
         address voter = msg.sender;
         // require(exists[voter] == true, "You are not allowed to vote");
         // require(whiteList[voter] > 0, "You have already voted");

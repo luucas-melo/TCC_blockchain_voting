@@ -4,6 +4,7 @@ import {
   Avatar,
   Badge,
   Box,
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -23,83 +24,29 @@ import {
   Portal,
   Skeleton,
   Text,
-  ToastId,
   useColorModeValue,
-  useToast,
   VStack,
   WrapItem,
 } from "@chakra-ui/react";
 import type { Route } from "next";
 import { default as NextLink } from "next/link";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { MdHowToVote } from "react-icons/md";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
 import { ActionButton } from "@/components/ActionButton";
-import { useMetamask } from "@/hooks/useMetamask";
-import { VotingContract } from "@/lib/contracts";
+import { DangerPopup } from "@/components/DangerPopup";
+import { useVoting } from "@/hooks/useVoting";
+import { getContractData, VotingContract } from "@/lib/contracts";
 
 interface VotingCardProps {
   contract: Contract;
 }
 
-const getContractData = (contract: Contract) => async () => {
-  console.log("contract", contract);
-
-  const electionChiefPromise = contract.methods
-    .electionCommission()
-    .call() as Promise<string>;
-  const titlePromise = contract.methods.title().call() as Promise<string>;
-  const votingDurationPromise = contract.methods
-    .votingDuration()
-    .call() as Promise<string>;
-  const proposalsPromise = contract.methods.getProposals().call() as Promise<
-    string[]
-  >;
-
-  const whiteListPromise = contract.methods
-    .getWhiteListedAddresses()
-    .call() as Promise<string[]>;
-  // console.log("white", whiteListPromise);
-
-  console.log("methods", contract.methods);
-
-  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
-
-  const [title, votingDuration, whiteList, proposals, isOpen, electionChief] =
-    await Promise.allSettled([
-      titlePromise,
-      votingDurationPromise,
-      whiteListPromise,
-      proposalsPromise,
-      isOpenPromise,
-      electionChiefPromise,
-    ]);
-
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  console.log("data", title, votingDuration, proposals, isOpen, whiteList);
-
-  return {
-    title,
-    votingDuration,
-    proposals,
-    isOpen,
-    electionChief,
-    whiteList,
-  };
-};
-
 export default function VotingPage({ params }: { params: { id: string } }) {
-  const {
-    state: { wallet },
-  } = useMetamask();
-
   const contract = VotingContract(params.id);
-
-  const toast = useToast();
-  const toastIdRef = useRef<ToastId>();
 
   const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
@@ -107,65 +54,9 @@ export default function VotingPage({ params }: { params: { id: string } }) {
     data,
     isLoading,
     mutate: updateContract,
-  } = useSWR(`own-${contract?.options?.address}`, getContractData(contract));
+  } = useSWR(contract?.options?.address, getContractData(contract));
 
-  const start = useCallback(async () => {
-    toastIdRef.current = toast({
-      status: "info",
-      title: "Iniciando votação",
-      description: "Aguarde a confirmação da transação",
-    });
-
-    try {
-      const gasLimit = await contract.methods.startVoting().estimateGas({
-        from: wallet,
-      });
-
-      const response = await contract.methods
-        .startVoting()
-        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-        .on("error", (error, receipt) => {
-          console.error("error TESTE:", error);
-          console.log("receipt", receipt);
-
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "error",
-              title: "Erro ao inicar votação",
-              description: error?.message
-                ?.split(":")?.[2]
-                ?.replace("revert", ""),
-            });
-        })
-        .on("transactionHash", (transactionHash) => {
-          console.log(`Transaction hash: ${transactionHash}`);
-          updateContract();
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "success",
-              title: "Votação iniciada!",
-              description: `#${transactionHash}`,
-            });
-        })
-        .on("receipt", (receipt) => {
-          console.log("receipt", receipt);
-        })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
-        });
-
-      console.log("response", response);
-    } catch (e) {
-      console.log("error estimateGas", e);
-
-      if (toastIdRef.current)
-        toast.update(toastIdRef.current, {
-          status: "error",
-          title: "Erro ao inicar votação",
-          description: (e as Error)?.message,
-        });
-    }
-  }, [contract, toast, updateContract, wallet]);
+  const { startVoting, vote } = useVoting(contract, updateContract);
 
   const date = useMemo(() => {
     if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
@@ -252,7 +143,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                 <Portal>
                   <MenuList>
                     <MenuItem>Editar</MenuItem>
-                    <MenuItem onClick={start}>Iniciar</MenuItem>
+                    <MenuItem onClick={startVoting}>Iniciar</MenuItem>
                     <MenuDivider />
                     <MenuItem color="red.400">Cancelar</MenuItem>
                   </MenuList>
@@ -271,31 +162,50 @@ export default function VotingPage({ params }: { params: { id: string } }) {
 
             {isLoading && (
               <Flex gap={8}>
-                <Skeleton isLoaded={!isLoading} w="20%" height="112px" />
-                <Skeleton isLoaded={!isLoading} w="20%" height="112px" />
+                <Skeleton isLoaded={!isLoading} w="18%" height="144px" />
+                <Skeleton isLoaded={!isLoading} w="18%" height="144px" />
               </Flex>
             )}
             <Skeleton isLoaded={!isLoading}>
               <Flex gap={8}>
-                {getPromiseValue("proposals")?.map?.((proposal) => (
+                {getPromiseValue("proposals")?.map?.((proposal, index) => (
                   <Card
                     key={proposal}
                     boxShadow="sm"
-                    _hover={{
-                      boxShadow: "md",
-                      cursor: "pointer",
-                    }}
                     display="flex"
                     flexDirection="column"
                     align="center"
                     py={4}
-                    px={10}
+                    px={8}
                     gap={2}
                   >
+                    {/* <Flex
+                      width="full"
+                      justify="flex-end"
+                      transform="translateX(30px)"
+                    >
+                      <ActionButton
+                        icon={<MdHowToVote />}
+                        label="Votar nessa opção"
+                      />
+                    </Flex> */}
                     <WrapItem>
                       <Avatar name={proposal} />
                     </WrapItem>
                     <Text fontWeight="medium">{proposal}</Text>
+                    <DangerPopup
+                      message="Você tem certeza que deseja votar nessa opção?"
+                      onConfirm={vote({ proposalIndex: index })}
+                    >
+                      <Button
+                        variant="ghost"
+                        leftIcon={<MdHowToVote />}
+                        w="full"
+                        size="xs"
+                      >
+                        Votar
+                      </Button>
+                    </DangerPopup>
                   </Card>
                 ))}
               </Flex>

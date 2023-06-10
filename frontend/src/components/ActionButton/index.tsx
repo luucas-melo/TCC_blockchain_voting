@@ -24,8 +24,6 @@ function ActionButtonInner(
     <Tooltip
       label={label}
       placement="top"
-      bg="Primary.500"
-      color="white"
       openDelay={250}
       closeDelay={100}
       {...tooltipProps}
