@@ -8,6 +8,8 @@ contract Voting {
     mapping(address => uint) whiteList;
     mapping(address => bool) exists;
 
+    address[] public whiteListedAddresses;
+
     struct Proposal {
         string name;
         uint voteCount;
@@ -41,6 +43,7 @@ contract Voting {
         for (uint i = 0; i < _whiteList.length; i++) {
             whiteList[_whiteList[i]] = 1;
             exists[_whiteList[i]] = true;
+            whiteListedAddresses.push(_whiteList[i]);
         }
     }
 
@@ -96,6 +99,7 @@ contract Voting {
         if (exists[voter]) return;
 
         whiteList[voter] = 1;
+        whiteListedAddresses.push(voter);
         exists[voter] = true;
     }
 
@@ -118,6 +122,18 @@ contract Voting {
         }
 
         return proposalNames;
+    }
+
+    function getWhiteListedAddresses() public view returns (address[] memory) {
+        uint arrayLength = whiteListedAddresses.length;
+
+        address[] memory addresses = new address[](arrayLength);
+
+        for (uint i = 0; i < arrayLength; i++) {
+            addresses[i] = whiteListedAddresses[i];
+        }
+
+        return whiteListedAddresses;
     }
 
     function editProposal(

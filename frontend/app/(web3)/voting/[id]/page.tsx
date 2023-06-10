@@ -56,23 +56,23 @@ const getContractData = (contract: Contract) => async () => {
     string[]
   >;
 
-  // const whiteListPromise = contract.methods.getWhiteList().call() as Promise<
-  //   string[]
-  // >;
+  const whiteListPromise = contract.methods
+    .getWhiteListedAddresses()
+    .call() as Promise<string[]>;
   // console.log("white", whiteListPromise);
 
   console.log("methods", contract.methods);
 
   const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
 
-  const [title, votingDuration, proposals, isOpen, electionChief] =
+  const [title, votingDuration, proposals, isOpen, electionChief, whiteList] =
     await Promise.allSettled([
       titlePromise,
       votingDurationPromise,
       proposalsPromise,
       isOpenPromise,
       electionChiefPromise,
-      // whiteListPromise,
+      whiteListPromise,
     ]);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -85,7 +85,7 @@ const getContractData = (contract: Contract) => async () => {
     proposals,
     isOpen,
     electionChief,
-    // whiteList,
+    whiteList,
   };
 };
 
@@ -304,7 +304,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
             )}
             <Skeleton isLoaded={!isLoading}>
               <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
-                {/* {getPromiseValue("whiteList")?.map?.((proposal) => (
+                {getPromiseValue("whiteList")?.map?.((proposal) => (
                   <Badge
                     fontSize="md"
                     variant="outline"
@@ -314,7 +314,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                   >
                     {proposal}
                   </Badge>
-                ))} */}
+                ))}
               </Grid>
             </Skeleton>
           </Box>
