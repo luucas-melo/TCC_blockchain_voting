@@ -5,10 +5,15 @@ import Contract from "web3-eth-contract";
 
 import { useMetamask } from "./useMetamask";
 
+interface ReturnType {
+  vote: ({ proposalIndex }: { proposalIndex: number }) => () => Promise<void>;
+  startVoting: () => Promise<void>;
+}
+
 export const useVoting = (
   contract: Contract,
   updateContract: KeyedMutator<any>
-) => {
+): ReturnType => {
   const {
     state: { wallet },
   } = useMetamask();

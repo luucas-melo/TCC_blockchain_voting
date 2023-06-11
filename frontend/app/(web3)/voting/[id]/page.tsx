@@ -34,16 +34,11 @@ import { useCallback, useMemo } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdHowToVote } from "react-icons/md";
 import useSWR from "swr";
-import { Contract } from "web3-eth-contract";
 
 import { ActionButton } from "@/components/ActionButton";
 import { DangerPopup } from "@/components/DangerPopup";
 import { useVoting } from "@/hooks/useVoting";
 import { getContractData, VotingContract } from "@/lib/contracts";
-
-interface VotingCardProps {
-  contract: Contract;
-}
 
 export default function VotingPage({ params }: { params: { id: string } }) {
   const contract = VotingContract(params.id);
