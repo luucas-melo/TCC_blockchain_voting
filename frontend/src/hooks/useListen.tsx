@@ -1,3 +1,5 @@
+"use client";
+
 import { useMetamask } from "./useMetamask";
 
 export const useListen = () => {

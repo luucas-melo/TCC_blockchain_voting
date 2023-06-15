@@ -10,8 +10,15 @@ export const VotingFactoryContract = new web3.eth.Contract(
   Object.entries(VotingFactoryArtifact.networks)[0][1].address
 );
 
-export const VotingContract = (address: string) =>
-  new web3.eth.Contract(VotingArtifact.abi, address);
+export const VotingContract = (address: string) => {
+  try {
+    return new web3.eth.Contract(VotingArtifact.abi, address);
+  } catch (error) {
+    console.log(error);
+
+    return {} as Contract<typeof VotingArtifact.abi>;
+  }
+};
 
 export const getContractData =
   (contract: Contract<typeof VotingArtifact.abi>) => async () => {

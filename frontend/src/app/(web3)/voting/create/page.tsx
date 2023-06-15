@@ -1,11 +1,11 @@
 "use client";
 
-import { Card, Flex } from "@chakra-ui/react";
+import { Card, Center } from "@chakra-ui/react";
 
 import { CreateVotingForm } from "@/components/CreateVotingForm";
 
 const CreateVoting = () => (
-  <Flex width="100%" justifyContent="center" alignSelf="center">
+  <Center height="100%">
     <Card
       gap={6}
       width="100%"
@@ -19,7 +19,7 @@ const CreateVoting = () => (
     >
       <CreateVotingForm />
     </Card>
-  </Flex>
+  </Center>
 );
 
 export default CreateVoting;

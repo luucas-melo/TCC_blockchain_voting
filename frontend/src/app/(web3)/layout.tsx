@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import { useListen } from "@/hooks/useListen";
 import { useMetamask } from "@/hooks/useMetamask";
 
 export default function Web3Layout({
   children,
-  auth,
+  authModal,
 }: {
   children: React.ReactNode;
-  auth: React.ReactNode;
+  authModal: React.ReactNode;
 }) {
   const {
     dispatch,
@@ -54,10 +54,15 @@ export default function Web3Layout({
   console.log("status", status);
   console.groupEnd();
 
+  // if (!isConnected && status !== "pageNotLoaded") {
+  //   console.log("redirecting to /login");
+  //   redirect("/login");
+  // }
+
   return (
     <>
       {children}
-      {!isConnected ? auth : null}
+      {!isConnected ? authModal : null}
     </>
   );
 }

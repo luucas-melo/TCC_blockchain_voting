@@ -11,17 +11,21 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useListen } from "@/hooks/useListen";
 import { useMetamask } from "@/hooks/useMetamask";
 
-const isOpen = true;
-
 const onClose = () => {};
 
 const Login = () => {
+  const router = useRouter();
+
+  // const onClose = useCallback(() => router.back(), [router]);
+
   const {
     dispatch,
     state: { status, isMetamaskInstalled, wallet },
@@ -47,6 +51,8 @@ const Login = () => {
 
       // we can register an event listener for changes to the users wallet
       listen();
+
+      router.replace("/");
     }
   };
 
@@ -54,9 +60,11 @@ const Login = () => {
     dispatch({ type: "disconnect" });
   };
 
+  const backgroound = useColorModeValue("blackAlpha.700", "blackAlpha.200");
+
   return (
-    <Modal isCentered isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay background="blackAlpha.800" />
+    <Modal isCentered isOpen onClose={onClose}>
+      <ModalOverlay background={backgroound} backdropFilter="blur(4px)" />
       <ModalContent>
         <ModalHeader>Autenticação</ModalHeader>
         <ModalCloseButton />

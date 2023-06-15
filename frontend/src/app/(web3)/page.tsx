@@ -8,6 +8,7 @@ import {
   Grid,
   Heading,
   Icon,
+  Skeleton,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -20,7 +21,7 @@ import { VotingCard } from "@/components/VotingCard";
 import { useMetamask } from "@/hooks/useMetamask";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
-const Home = () => {
+export function Home() {
   const {
     state: { wallet },
   } = useMetamask();
@@ -65,37 +66,86 @@ const Home = () => {
   return (
     <VStack align="stretch" gap={8}>
       <Flex justifyContent="space-between" alignItems="center" wrap="wrap">
-        <Box>
+        <Flex direction="column" alignItems="baseline">
           <Heading>Minhas Votações</Heading>
-          <Text>
-            {votings?.length} votaç{votings?.length !== 1 ? "ões" : "ão"}
-          </Text>
-        </Box>
+          <Skeleton isLoaded={!votingContractAddresses?.isLoading}>
+            <Text w="fit-content">
+              Elegível em {votings?.length} votaç
+              {votings?.length !== 1 ? "ões" : "ão"}
+            </Text>
+          </Skeleton>
+        </Flex>
         <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
           <Icon as={FaPlus} mr={2} />
           Votação
         </Button>
       </Flex>
 
+      {!votingContractAddresses?.isLoading && !votings?.length && (
+        <VStack spacing={8} textAlign="center">
+          <Heading size="lg" maxWidth="33ch">
+            Você ainda não é um eleitor elegível para nenhuma votação.
+          </Heading>
+          <Text maxW="43ch">
+            Você pode criar uma votação e convidar outros eleitores para
+            participar. Ou você pode pedir para ser convidado para uma votação.
+          </Text>
+          <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
+            <Icon as={FaPlus} mr={2} />
+            Iniciar votação
+          </Button>
+        </VStack>
+      )}
+
       <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
+        {votingContractAddresses?.isLoading && (
+          <>
+            <Skeleton w="330px" h="240px" />
+            <Skeleton w="330px" h="240px" />
+            <Skeleton w="330px" h="240px" />
+          </>
+        )}
+
         {votings?.map((contract) => (
           <VotingCard contract={contract} key={contract?.options?.address} />
         ))}
       </Grid>
 
-      <Heading size="lg">Todas as votações</Heading>
-      <Divider />
+      <Box>
+        <Heading size="lg">Todas as votações</Heading>
+        <Divider mb={6} />
 
-      <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
-        {allVotings?.map((contract) => (
-          <VotingCard
-            contract={contract}
-            key={`${contract?.options?.address}allVotings`}
-          />
-        ))}
-      </Grid>
+        <Grid templateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={4}>
+          {allDeployedAddresses?.isLoading && (
+            <>
+              <Skeleton w="330px" h="240px" />
+              <Skeleton w="330px" h="240px" />
+              <Skeleton w="330px" h="240px" />
+            </>
+          )}
+
+          {!allDeployedAddresses?.isLoading && !allVotings?.length && (
+            <VStack spacing={8}>
+              <Heading>
+                Você ainda não criou nenhuma votação. Crie uma agora!
+              </Heading>
+              <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
+                <Icon as={FaPlus} mr={2} />
+                Votação
+              </Button>
+            </VStack>
+          )}
+
+          {allVotings?.map((contract) => (
+            <VotingCard
+              contract={contract}
+              key={`${contract?.options?.address}allVotings`}
+            />
+          ))}
+        </Grid>
+      </Box>
     </VStack>
   );
-};
+}
 
 export default Home;

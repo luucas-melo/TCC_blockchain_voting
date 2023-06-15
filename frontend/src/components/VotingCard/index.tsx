@@ -73,7 +73,7 @@ export function VotingCard({ contract }: VotingCardProps) {
     <Flex direction="column">
       <Link
         as={NextLink}
-        href={`/voting/${contract?.options?.address}`}
+        href={`/voting/${contract?.options?.address}` as Route}
         color="gray.400"
         fontSize="xs"
       >

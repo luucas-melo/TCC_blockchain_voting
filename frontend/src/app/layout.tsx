@@ -27,44 +27,31 @@ export default function RootLayout({
     <html lang="en" className={`${roboto.variable} ${poppins.variable}`}>
       <body>
         <Providers>
-          {/* <BackButton
-            // position={{
-            // base: "fixed",
-            // lg: "sticky",
-            // }}
-            // position="sticky"
-            position="fixed"
-            // gridColumn={1}
-            // gridRow={1}
-            top={5}
-            left={[4, 6, 8]}
-            justifySelf="center"
-            zIndex="sticky"
-          /> */}
-          <main>
-            <BackButton
-              position="sticky"
-              gridColumn={1}
-              gridRow={1}
-              top={5}
-              left={[4, 6, 8]}
-              justifySelf="end"
-              zIndex="sticky"
-            />
-            {children}
-          </main>
+          <BackButton
+            position={{
+              base: "fixed",
+              "2xl": "sticky",
+            }}
+            gridColumn={3}
+            gridRow={2}
+            top={[2, 4, 6, 8]}
+            right={2}
+            justifySelf="start"
+            zIndex={1}
+          />
+          <main>{children}</main>
           <ColorMode
-            // position={{
-            //   base: "fixed",
-            //   lg: "sticky",
-            // }}
-            position="fixed"
-            // gridColumn={3}
-            justifySelf="center"
+            position={{
+              base: "fixed",
+              "2xl": "sticky",
+            }}
+            gridColumn={3}
+            gridRow={2}
+            bottom={[2, 4, 6, 8]}
+            right={2}
+            justifySelf="start"
             alignSelf="end"
-            bottom={5}
-            right={5}
-            zIndex="sticky"
+            zIndex={1}
           />
         </Providers>
       </body>

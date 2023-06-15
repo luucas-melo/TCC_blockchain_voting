@@ -15,13 +15,10 @@ import {
   Heading,
   HStack,
   Icon,
-  Link,
   Skeleton,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import type { Route } from "next";
-import NextLink from "next/link";
 import { useCallback, useMemo } from "react";
 import { MdHowToVote } from "react-icons/md";
 import useSWR from "swr";
@@ -31,8 +28,32 @@ import { VotingMenu } from "@/components/VotingMenu";
 import { useVoting } from "@/hooks/useVoting";
 import { getContractData, VotingContract } from "@/lib/contracts";
 
-export default function VotingPage({ params }: { params: { id: string } }) {
-  const contract = VotingContract(params.id);
+// export async function generateStaticParams() {
+//   const web3 = new Web3("http://127.0.0.1:8545");
+
+//   const VotingFactoryContract = new web3.eth.Contract(
+//     VotingFactoryArtifact.abi,
+//     Object.entries(VotingFactoryArtifact.networks)[0][1].address
+//   );
+
+//   const contracts = await VotingFactoryContract.methods
+//     .getDeployedContracts()
+//     .call();
+
+//   console.log("generateStaticParams ~ contracts:", contracts);
+
+//   return contracts.map((contract) => ({
+//     contract,
+//   }));
+// }
+
+export default function VotingPage({
+  params,
+}: {
+  params: { contract: string };
+}) {
+  console.log("VotingPage:", params);
+  const contract = VotingContract(params.contract);
 
   // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
@@ -75,14 +96,9 @@ export default function VotingPage({ params }: { params: { id: string } }) {
 
   return (
     <Flex direction="column">
-      <Link
-        as={NextLink}
-        href={`/voting/${contract?.options?.address}`}
-        color="gray.400"
-        fontSize="xs"
-      >
+      <Text color="gray.400" fontSize="xs">
         #{contract?.options?.address}
-      </Link>
+      </Text>
       <Card
         display="grid"
         gridTemplateRows="auto 1fr auto"
@@ -100,12 +116,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
         >
           <Skeleton isLoaded={!isLoading}>
             <VStack align="start" spacing={1}>
-              <Heading
-                as={NextLink}
-                href={`/voting/${contract?.options?.address}` as Route}
-                size="md"
-                textTransform="capitalize"
-              >
+              <Heading size="md" textTransform="capitalize">
                 {getPromiseValue("title") ?? "Carregando..."}
               </Heading>
               <Badge

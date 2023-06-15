@@ -1,3 +1,5 @@
+"use client";
+
 import { ToastId, useToast } from "@chakra-ui/react";
 import { useCallback, useRef } from "react";
 import { KeyedMutator } from "swr";

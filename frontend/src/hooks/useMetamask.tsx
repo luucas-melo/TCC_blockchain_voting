@@ -1,4 +1,6 @@
-import React, { type PropsWithChildren } from "react";
+"use client";
+
+import React, { type PropsWithChildren, useMemo } from "react";
 
 type ConnectAction = { type: "connect"; wallet: string; balance: string };
 
@@ -87,7 +89,13 @@ const MetamaskContext = React.createContext<
 
 function MetamaskProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = React.useReducer(metamaskReducer, initialState);
-  const value = { state, dispatch };
+  const value = useMemo(
+    () => ({
+      state,
+      dispatch,
+    }),
+    [state]
+  );
 
   return (
     <MetamaskContext.Provider value={value}>
