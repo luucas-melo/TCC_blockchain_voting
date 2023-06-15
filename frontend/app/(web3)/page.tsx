@@ -31,7 +31,7 @@ const Home = () => {
     [wallet, "votings"],
     async () => {
       const res = await VotingFactoryContract.methods.getVotings().call({
-        from: wallet,
+        from: wallet as string,
       });
 
       return res;

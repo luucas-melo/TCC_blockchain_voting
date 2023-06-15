@@ -1,0 +1,4 @@
+[
+  "../blockchain/build/contracts/VotingFactory.json",
+  "../blockchain/build/contracts/Voting.json"
+]

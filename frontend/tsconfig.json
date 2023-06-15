@@ -29,7 +29,12 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/types/app/(web3)/@login/login/page.tsx",
-    ".next/types/app/(web3)/@login/login/default.tsx"
+    ".next/types/app/(web3)/@login/login/default.tsx",
+    "gen.mjs"
   ],
   "exclude": ["node_modules"]
+  // "ts-node": {
+  //   "esm": true,
+  //   "experimentalSpecifierResolution": "node"
+  // }
 }

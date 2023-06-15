@@ -15,18 +15,19 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { Route } from "next";
-import { default as NextLink } from "next/link";
+import NextLink from "next/link";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
+import { VotingArtifact } from "@/constants/Voting";
 import { useVoting } from "@/hooks/useVoting";
 import { getContractData } from "@/lib/contracts";
 
 import { VotingMenu } from "../VotingMenu";
 
 interface VotingCardProps {
-  contract: Contract;
+  contract: Contract<typeof VotingArtifact.abi>;
 }
 
 export function VotingCard({ contract }: VotingCardProps) {
@@ -108,6 +109,7 @@ export function VotingCard({ contract }: VotingCardProps) {
                 colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
                 cursor="default"
               >
+                {getPromiseValue("isStarted") ? "" : "Não iniciada"}
                 {getPromiseValue("isOpen") ? "Aberta" : ""}
                 {getPromiseValue("isEnded") ? "Fechada" : ""}
                 {getPromiseValue("isCancelled") ? "Cancelada" : ""}

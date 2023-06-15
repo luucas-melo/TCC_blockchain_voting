@@ -45,7 +45,7 @@ export function CreateVotingForm() {
 
       // const gasPrice = await web3.eth.getGasPrice();
       // const tx = {
-      //   from: wallet,
+      //   from: wallet as string,
       //   data,
       //   gas: "20000000000", // hard coded for now
       //   gasPrice,
@@ -55,20 +55,19 @@ export function CreateVotingForm() {
       // tx.gas = (gasLimit * 1.5).toFixed(0);
 
       const gasLimit = await VotingFactoryContract.methods
-        .deploy(...inputConsts)
-        .estimateGas({ from: wallet });
+        .deploy(title, proposals, whiteList, deadline)
+        .estimateGas({ from: wallet as string });
 
       console.log("teste", gasLimit);
 
       const response = await VotingFactoryContract.methods
-        .deploy(...inputConsts)
+        .deploy(title, proposals, whiteList, deadline)
         .send({
-          from: wallet,
-          gas: (gasLimit * 1.5).toFixed(0),
+          from: wallet as string,
+          gas: (gasLimit * BigInt(2)).toString(),
         })
-        .on("error", (error, receipt) => {
+        .on("error", (error) => {
           console.error("error TESTE:", error);
-          console.log("receipt", receipt);
 
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
@@ -85,8 +84,8 @@ export function CreateVotingForm() {
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
         })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
+        .on("confirmation", (confirmation) => {
+          console.log("confirmation", confirmation);
         });
       // .then((res) => {
       //   console.log("res", res);

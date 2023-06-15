@@ -3,6 +3,8 @@ import { useCallback, useRef } from "react";
 import { KeyedMutator } from "swr";
 import Contract from "web3-eth-contract";
 
+import { VotingArtifact } from "@/constants/Voting";
+
 import { useMetamask } from "./useMetamask";
 
 // interface ReturnType {
@@ -11,7 +13,7 @@ import { useMetamask } from "./useMetamask";
 // }
 
 export const useVoting = (
-  contract: Contract,
+  contract: Contract<typeof VotingArtifact.abi>,
   updateContract: KeyedMutator<any>
 ) => {
   const {
@@ -30,15 +32,17 @@ export const useVoting = (
 
     try {
       const gasLimit = await contract.methods.startVoting().estimateGas({
-        from: wallet,
+        from: wallet as string,
       });
 
       const response = await contract.methods
         .startVoting()
-        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-        .on("error", (error, receipt) => {
+        .send({
+          from: wallet as string,
+          gas: (gasLimit * BigInt(2)).toString(),
+        })
+        .on("error", (error) => {
           console.error("error TESTE:", error);
-          console.log("receipt", receipt);
 
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
@@ -62,8 +66,8 @@ export const useVoting = (
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
         })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
+        .on("confirmation", (confirmation) => {
+          console.log("confirmation", confirmation);
         });
 
       console.log("response", response);
@@ -94,15 +98,17 @@ export const useVoting = (
           const gasLimit = await contract.methods
             .vote(proposalIndex)
             .estimateGas({
-              from: wallet,
+              from: wallet as string,
             });
 
           const response = await contract.methods
             .vote(proposalIndex)
-            .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-            .on("error", (error, receipt) => {
+            .send({
+              from: wallet as string,
+              gas: (gasLimit * BigInt(2)).toString(),
+            })
+            .on("error", (error) => {
               console.error("error TESTE:", error);
-              console.log("receipt", receipt);
 
               if (toastIdRef.current)
                 toast.update(toastIdRef.current, {
@@ -126,8 +132,8 @@ export const useVoting = (
             .on("receipt", (receipt) => {
               console.log("receipt", receipt);
             })
-            .on("confirmation", (confirmationNumber, receipt) => {
-              console.log("confirmation", confirmationNumber, receipt);
+            .on("confirmation", (confirmation) => {
+              console.log("confirmation", confirmation);
             });
 
           console.log("response", response);
@@ -156,15 +162,17 @@ export const useVoting = (
 
     try {
       const gasLimit = await contract.methods.cancelVoting().estimateGas({
-        from: wallet,
+        from: wallet as string,
       });
 
       const response = await contract.methods
         .cancelVoting()
-        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
-        .on("error", (error, receipt) => {
+        .send({
+          from: wallet as string,
+          gas: (gasLimit * BigInt(2)).toString(),
+        })
+        .on("error", (error) => {
           console.error("error TESTE:", error);
-          console.log("receipt", receipt);
 
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
@@ -188,13 +196,13 @@ export const useVoting = (
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
         })
-        .on("confirmation", (confirmationNumber, receipt) => {
-          console.log("confirmation", confirmationNumber, receipt);
+        .on("confirmation", (confirmation) => {
+          console.log("confirmation", confirmation);
         });
 
       console.log("response", response);
     } catch (e) {
-      console.log("error estimateGas", e);
+      console.error("error estimateGas", e);
 
       if (toastIdRef.current)
         toast.update(toastIdRef.current, {

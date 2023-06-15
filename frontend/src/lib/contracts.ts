@@ -1,92 +1,102 @@
 import Contract from "web3-eth-contract";
 
-import { votingFactoryAddress } from "@/constants/voitngFactoriyAddress";
-import { VotingAbi } from "@/constants/VotingAbi";
-import { VotingFactoryAbi } from "@/constants/VotingFactoryAbi";
+import { VotingArtifact } from "@/constants/Voting";
+import { VotingFactoryArtifact } from "@/constants/VotingFactory";
 
 import { web3 } from "./web3";
 
 export const VotingFactoryContract = new web3.eth.Contract(
-  VotingFactoryAbi,
-  votingFactoryAddress
+  VotingFactoryArtifact.abi,
+  Object.entries(VotingFactoryArtifact.networks)[0][1].address
 );
 
 export const VotingContract = (address: string) =>
-  new web3.eth.Contract(VotingAbi, address);
+  new web3.eth.Contract(VotingArtifact.abi, address);
 
-export const getContractData = (contract: Contract) => async () => {
-  const electionChiefPromise = contract.methods
-    .electionCommission()
-    .call() as Promise<string>;
+export const getContractData =
+  (contract: Contract<typeof VotingArtifact.abi>) => async () => {
+    const electionChiefPromise = contract.methods
+      .electionCommission()
+      .call() as Promise<string>;
 
-  const titlePromise = contract.methods.title().call() as Promise<string>;
+    const titlePromise = contract.methods.title().call() as Promise<string>;
 
-  const votingDurationPromise = contract.methods
-    .votingDuration()
-    .call() as Promise<string>;
+    const votingDurationPromise = contract.methods
+      .votingDuration()
+      .call() as Promise<string>;
 
-  const proposalsPromise = contract.methods.getProposals().call() as Promise<
-    string[]
-  >;
+    const proposalsPromise = contract.methods.getProposals().call() as Promise<
+      string[]
+    >;
 
-  const isCancelledPromise = contract.methods
-    .votingCancelled()
-    .call() as Promise<boolean>;
+    const isCancelledPromise = contract.methods
+      .votingCancelled()
+      .call() as Promise<boolean>;
 
-  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
+    const isStartedPromise = contract.methods
+      .votingStarted()
+      .call() as Promise<boolean>;
 
-  const isEndedPromise = contract.methods
-    .votingEnded()
-    .call() as Promise<boolean>;
+    const isOpenPromise = contract.methods
+      .getIsOpen()
+      .call() as Promise<boolean>;
 
-  const whiteListPromise = contract.methods
-    .getWhiteListedAddresses()
-    .call() as Promise<string[]>;
-  // console.log("white", whiteListPromise);
+    const isEndedPromise = contract.methods
+      .votingEnded()
+      .call() as Promise<boolean>;
 
-  console.log("methods", contract.methods);
+    const whiteListPromise = contract.methods
+      .getWhiteListedAddresses()
+      .call() as Promise<string[]>;
+    // console.log("white", whiteListPromise);
 
-  const [
-    title,
-    votingDuration,
-    whiteList,
-    proposals,
-    isOpen,
-    isCancelled,
-    isEnded,
-    electionChief,
-  ] = await Promise.allSettled([
-    titlePromise,
-    votingDurationPromise,
-    whiteListPromise,
-    proposalsPromise,
-    isOpenPromise,
-    isCancelledPromise,
-    isEndedPromise,
-    electionChiefPromise,
-  ]);
+    console.log("methods", contract.methods);
 
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+    const [
+      title,
+      votingDuration,
+      whiteList,
+      proposals,
+      isOpen,
+      isCancelled,
+      isEnded,
+      isStarted,
+      electionChief,
+    ] = await Promise.allSettled([
+      titlePromise,
+      votingDurationPromise,
+      whiteListPromise,
+      proposalsPromise,
+      isOpenPromise,
+      isCancelledPromise,
+      isEndedPromise,
+      isStartedPromise,
+      electionChiefPromise,
+    ]);
 
-  console.log(
-    "data",
-    title,
-    votingDuration,
-    proposals,
-    isOpen,
-    isCancelled,
-    isEnded,
-    whiteList
-  );
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  return {
-    title,
-    votingDuration,
-    proposals,
-    isOpen,
-    electionChief,
-    isCancelled,
-    isEnded,
-    whiteList,
+    console.log(
+      "data",
+      title,
+      votingDuration,
+      proposals,
+      isOpen,
+      isCancelled,
+      isEnded,
+      isStarted,
+      whiteList
+    );
+
+    return {
+      title,
+      votingDuration,
+      proposals,
+      isOpen,
+      electionChief,
+      isCancelled,
+      isEnded,
+      isStarted,
+      whiteList,
+    };
   };
-};
