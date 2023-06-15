@@ -8,14 +8,7 @@ import {
   Flex,
   Heading,
   HStack,
-  Icon,
   Link,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Portal,
   Skeleton,
   Text,
   useColorModeValue,
@@ -24,14 +17,13 @@ import {
 import type { Route } from "next";
 import { default as NextLink } from "next/link";
 import { useCallback, useMemo } from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
 
 import { useVoting } from "@/hooks/useVoting";
 import { getContractData } from "@/lib/contracts";
 
-import { ActionButton } from "../ActionButton";
+import { VotingMenu } from "../VotingMenu";
 
 interface VotingCardProps {
   contract: Contract;
@@ -46,7 +38,7 @@ export function VotingCard({ contract }: VotingCardProps) {
     mutate: updateContract,
   } = useSWR(contract?.options?.address, getContractData(contract));
 
-  const { startVoting } = useVoting(contract, updateContract);
+  const { startVoting, cancelVoting } = useVoting(contract, updateContract);
 
   console.log("VotingCard ~ data:", data);
 
@@ -107,6 +99,7 @@ export function VotingCard({ contract }: VotingCardProps) {
                 as={NextLink}
                 href={`/voting/${contract?.options?.address}` as Route}
                 size="md"
+                textTransform="capitalize"
               >
                 {getPromiseValue("title") ?? "Carregando..."}
               </Heading>
@@ -115,7 +108,9 @@ export function VotingCard({ contract }: VotingCardProps) {
                 colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
                 cursor="default"
               >
-                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
+                {getPromiseValue("isOpen") ? "Aberta" : ""}
+                {getPromiseValue("isEnded") ? "Fechada" : ""}
+                {getPromiseValue("isCancelled") ? "Cancelada" : ""}
               </Badge>
             </VStack>
           </Skeleton>
@@ -127,21 +122,10 @@ export function VotingCard({ contract }: VotingCardProps) {
               </Badge>
             </Skeleton> */}
             {!isLoading && (
-              <Menu>
-                <MenuButton
-                  as={ActionButton}
-                  icon={<Icon as={BsThreeDotsVertical} />}
-                  colorScheme="gray"
-                />
-                <Portal>
-                  <MenuList>
-                    <MenuItem>Editar</MenuItem>
-                    <MenuItem onClick={startVoting}>Iniciar</MenuItem>
-                    <MenuDivider />
-                    <MenuItem color="red.400">Cancelar</MenuItem>
-                  </MenuList>
-                </Portal>
-              </Menu>
+              <VotingMenu
+                startVoting={startVoting}
+                cancelVoting={cancelVoting}
+              />
             )}
           </HStack>
         </CardHeader>

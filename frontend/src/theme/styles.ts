@@ -7,6 +7,7 @@ export const styles: Theme["styles"] = {
       backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
       backgroundSize: "cover",
       // backgroundAttachment: "fixed",
+      wordBreak: "break-word",
 
       _dark: {
         // backgroundImage: "linear-gradient(-20deg, #2b5876 0%, #4e4376 100%)",

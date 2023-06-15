@@ -5,21 +5,22 @@ import Contract from "web3-eth-contract";
 
 import { useMetamask } from "./useMetamask";
 
-interface ReturnType {
-  vote: ({ proposalIndex }: { proposalIndex: number }) => () => Promise<void>;
-  startVoting: () => Promise<void>;
-}
+// interface ReturnType {
+//   vote: ({ proposalIndex }: { proposalIndex: number }) => () => Promise<void>;
+//   startVoting: () => Promise<void>;
+// }
 
 export const useVoting = (
   contract: Contract,
   updateContract: KeyedMutator<any>
-): ReturnType => {
+) => {
   const {
     state: { wallet },
   } = useMetamask();
 
   const toastIdRef = useRef<ToastId>();
   const toast = useToast();
+
   const startVoting = useCallback(async () => {
     toastIdRef.current = toast({
       status: "info",
@@ -73,7 +74,9 @@ export const useVoting = (
         toast.update(toastIdRef.current, {
           status: "error",
           title: "Erro ao inicar votação",
-          description: (e as Error)?.message,
+          description:
+            (e as Error)?.message?.split(":")?.[2]?.replace("revert", "") ||
+            (e as Error)?.message,
         });
     }
   }, [contract, toast, updateContract, wallet]);
@@ -135,15 +138,78 @@ export const useVoting = (
             toast.update(toastIdRef.current, {
               status: "error",
               title: "Erro ao realizar voto",
-              description: (e as Error)?.message,
+              description:
+                (e as Error)?.message?.split(":")?.[2]?.replace("revert", "") ||
+                (e as Error)?.message,
             });
         }
       },
     [contract, toast, updateContract, wallet]
   );
 
+  const cancelVoting = useCallback(async () => {
+    toastIdRef.current = toast({
+      status: "info",
+      title: "Processando cancelamento",
+      description: "Aguarde a confirmação da transação",
+    });
+
+    try {
+      const gasLimit = await contract.methods.cancelVoting().estimateGas({
+        from: wallet,
+      });
+
+      const response = await contract.methods
+        .cancelVoting()
+        .send({ from: wallet, gas: (gasLimit * 1.5).toFixed(0) })
+        .on("error", (error, receipt) => {
+          console.error("error TESTE:", error);
+          console.log("receipt", receipt);
+
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "error",
+              title: "Erro ao cancelar votação",
+              description: error?.message
+                ?.split(":")?.[2]
+                ?.replace("revert", ""),
+            });
+        })
+        .on("transactionHash", (transactionHash) => {
+          console.log(`Transaction hash: ${transactionHash}`);
+          updateContract();
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "success",
+              title: "Votação cancelada com sucesso!",
+              description: `#${transactionHash}`,
+            });
+        })
+        .on("receipt", (receipt) => {
+          console.log("receipt", receipt);
+        })
+        .on("confirmation", (confirmationNumber, receipt) => {
+          console.log("confirmation", confirmationNumber, receipt);
+        });
+
+      console.log("response", response);
+    } catch (e) {
+      console.log("error estimateGas", e);
+
+      if (toastIdRef.current)
+        toast.update(toastIdRef.current, {
+          status: "error",
+          title: "Erro ao cancelar votação",
+          description:
+            (e as Error)?.message?.split(":")?.[2]?.replace("revert", "") ||
+            (e as Error)?.message,
+        });
+    }
+  }, [contract, toast, updateContract, wallet]);
+
   return {
     startVoting,
     vote,
+    cancelVoting,
   };
 };

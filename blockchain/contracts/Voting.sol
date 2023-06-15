@@ -20,6 +20,7 @@ contract Voting {
     uint256 public votingStartTime;
     bool public votingEnded; // Stores whether the voting has ended or not
     bool public votingStarted; // Stores whether the voting has started or not
+    bool public votingCancelled; // Stores whether the voting has been cancelled or not
 
     address public electionCommission;
 
@@ -73,8 +74,10 @@ contract Voting {
         _;
     }
 
-    modifier OnlyAfterVotingStart() {
+    modifier OnlyVotingIsOpen() {
         require(votingStarted == true, "Voting has not started yet.");
+        require(votingEnded == false, "Voting has already ended.");
+        require(votingCancelled == false, "Voting has been cancelled.");
         _;
     }
 
@@ -168,7 +171,7 @@ contract Voting {
 
     function vote(
         uint proposal
-    ) public OnlyAfterVotingStart onlyWhiteListed onlyBeforeVotingEnd onlyOnce {
+    ) public OnlyVotingIsOpen onlyWhiteListed onlyBeforeVotingEnd onlyOnce {
         address voter = msg.sender;
         // require(exists[voter] == true, "You are not allowed to vote");
         // require(whiteList[voter] > 0, "You have already voted");
@@ -184,6 +187,7 @@ contract Voting {
     }
 
     function startVoting() public onlyElectionCommission onlyBeforeVotingEnd {
+        require(votingCancelled == false, "Voting has been cancelled.");
         votingStartTime = block.timestamp;
         votingStarted = true;
     }
@@ -193,7 +197,15 @@ contract Voting {
     }
 
     function getIsOpen() public view returns (bool) {
-        return votingEnded == false && votingStarted == true;
+        return
+            votingEnded == false &&
+            votingStarted == true &&
+            votingCancelled == false;
+    }
+
+    function cancelVoting() public onlyElectionCommission onlyBeforeVotingEnd {
+        require(votingCancelled == false, "Voting has already been cancelled.");
+        votingCancelled = true;
     }
 
     function getResult()

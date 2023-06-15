@@ -18,13 +18,26 @@ export const getContractData = (contract: Contract) => async () => {
   const electionChiefPromise = contract.methods
     .electionCommission()
     .call() as Promise<string>;
+
   const titlePromise = contract.methods.title().call() as Promise<string>;
+
   const votingDurationPromise = contract.methods
     .votingDuration()
     .call() as Promise<string>;
+
   const proposalsPromise = contract.methods.getProposals().call() as Promise<
     string[]
   >;
+
+  const isCancelledPromise = contract.methods
+    .votingCancelled()
+    .call() as Promise<boolean>;
+
+  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
+
+  const isEndedPromise = contract.methods
+    .votingEnded()
+    .call() as Promise<boolean>;
 
   const whiteListPromise = contract.methods
     .getWhiteListedAddresses()
@@ -33,21 +46,38 @@ export const getContractData = (contract: Contract) => async () => {
 
   console.log("methods", contract.methods);
 
-  const isOpenPromise = contract.methods.getIsOpen().call() as Promise<boolean>;
-
-  const [title, votingDuration, whiteList, proposals, isOpen, electionChief] =
-    await Promise.allSettled([
-      titlePromise,
-      votingDurationPromise,
-      whiteListPromise,
-      proposalsPromise,
-      isOpenPromise,
-      electionChiefPromise,
-    ]);
+  const [
+    title,
+    votingDuration,
+    whiteList,
+    proposals,
+    isOpen,
+    isCancelled,
+    isEnded,
+    electionChief,
+  ] = await Promise.allSettled([
+    titlePromise,
+    votingDurationPromise,
+    whiteListPromise,
+    proposalsPromise,
+    isOpenPromise,
+    isCancelledPromise,
+    isEndedPromise,
+    electionChiefPromise,
+  ]);
 
   // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  console.log("data", title, votingDuration, proposals, isOpen, whiteList);
+  console.log(
+    "data",
+    title,
+    votingDuration,
+    proposals,
+    isOpen,
+    isCancelled,
+    isEnded,
+    whiteList
+  );
 
   return {
     title,
@@ -55,6 +85,8 @@ export const getContractData = (contract: Contract) => async () => {
     proposals,
     isOpen,
     electionChief,
+    isCancelled,
+    isEnded,
     whiteList,
   };
 };

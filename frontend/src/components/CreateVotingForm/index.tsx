@@ -20,6 +20,15 @@ export function CreateVotingForm() {
     state: { wallet },
   } = useMetamask();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<RegisterVoting>({
+    mode: "onChange",
+  });
+
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
 
@@ -151,20 +160,13 @@ export function CreateVotingForm() {
             status: "success",
             title: "Votação criada com sucesso",
           });
+        reset();
       } catch (error) {
         console.error("onSubmit:", error);
       }
     },
-    [createVoting, toast]
+    [createVoting, reset, toast]
   );
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RegisterVoting>({
-    mode: "onChange",
-  });
 
   return (
     <chakra.form onSubmit={handleSubmit(onSubmit)}>

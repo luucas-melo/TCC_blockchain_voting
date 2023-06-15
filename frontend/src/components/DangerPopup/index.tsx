@@ -24,12 +24,13 @@ import { useTimeout } from "@/hooks/useTimeout";
 
 interface DangerPopupProps extends Partial<PopoverProps> {
   message: string;
+  title: string;
   onConfirm: () => void | Promise<void>;
   children: ReactElement;
 }
 
 export function DangerPopup(props: DangerPopupProps) {
-  const { message, onConfirm, children, ...popoverProps } = props;
+  const { message, onConfirm, children, title, ...popoverProps } = props;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -63,7 +64,7 @@ export function DangerPopup(props: DangerPopupProps) {
             <HStack>
               <Icon as={IoWarning} color="yellow.400" fontSize="2xl" />
               <Heading size="md" fontWeight="semibold">
-                Atenção!
+                {title}
               </Heading>
             </HStack>
           </PopoverHeader>
@@ -71,7 +72,7 @@ export function DangerPopup(props: DangerPopupProps) {
           <PopoverBody textAlign="center" fontSize="md">
             <Text fontWeight="medium">{message}</Text>
 
-            <Text color="gray.200" mt={2}>
+            <Text color="GrayText" mt={2}>
               Está ação não poderá ser desfeita.
             </Text>
           </PopoverBody>
@@ -84,14 +85,14 @@ export function DangerPopup(props: DangerPopupProps) {
             >
               <Button
                 variant="ghost"
-                colorScheme="whiteAlpha"
-                color="white"
+                colorScheme="gray"
+                // color="white"
                 onClick={onClose}
               >
                 Cancelar
               </Button>
               <Button
-                variant="solid"
+                variant="outline"
                 colorScheme="red"
                 onClick={handleConfirm}
                 isLoading={isLoading}

@@ -16,34 +16,25 @@ import {
   HStack,
   Icon,
   Link,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Portal,
   Skeleton,
   Text,
-  useColorModeValue,
   VStack,
-  WrapItem,
 } from "@chakra-ui/react";
 import type { Route } from "next";
-import { default as NextLink } from "next/link";
+import NextLink from "next/link";
 import { useCallback, useMemo } from "react";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdHowToVote } from "react-icons/md";
 import useSWR from "swr";
 
-import { ActionButton } from "@/components/ActionButton";
 import { DangerPopup } from "@/components/DangerPopup";
+import { VotingMenu } from "@/components/VotingMenu";
 import { useVoting } from "@/hooks/useVoting";
 import { getContractData, VotingContract } from "@/lib/contracts";
 
 export default function VotingPage({ params }: { params: { id: string } }) {
   const contract = VotingContract(params.id);
 
-  const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
+  // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
   const {
     data,
@@ -51,7 +42,10 @@ export default function VotingPage({ params }: { params: { id: string } }) {
     mutate: updateContract,
   } = useSWR(contract?.options?.address, getContractData(contract));
 
-  const { startVoting, vote } = useVoting(contract, updateContract);
+  const { startVoting, vote, cancelVoting } = useVoting(
+    contract,
+    updateContract
+  );
 
   const date = useMemo(() => {
     if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
@@ -77,6 +71,8 @@ export default function VotingPage({ params }: { params: { id: string } }) {
     [data]
   );
 
+  if (!contract) return null;
+
   return (
     <Flex direction="column">
       <Link
@@ -92,7 +88,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
         gridTemplateRows="auto 1fr auto"
         gap={4}
         height="100%"
-        backgroundColor={background}
+        // backgroundColor={background}
         backdropFilter="blur(4px)"
         boxShadow="lg"
       >
@@ -108,6 +104,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                 as={NextLink}
                 href={`/voting/${contract?.options?.address}` as Route}
                 size="md"
+                textTransform="capitalize"
               >
                 {getPromiseValue("title") ?? "Carregando..."}
               </Heading>
@@ -116,7 +113,9 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                 colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
                 cursor="default"
               >
-                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
+                {getPromiseValue("isOpen") ? "Aberta" : ""}
+                {getPromiseValue("isEnded") ? "Fechada" : ""}
+                {getPromiseValue("isCancelled") ? "Cancelada" : ""}
               </Badge>
             </VStack>
           </Skeleton>
@@ -129,21 +128,10 @@ export default function VotingPage({ params }: { params: { id: string } }) {
             </Skeleton> */}
 
             {!isLoading && (
-              <Menu>
-                <MenuButton
-                  as={ActionButton}
-                  icon={<Icon as={BsThreeDotsVertical} />}
-                  colorScheme="gray"
-                />
-                <Portal>
-                  <MenuList>
-                    <MenuItem>Editar</MenuItem>
-                    <MenuItem onClick={startVoting}>Iniciar</MenuItem>
-                    <MenuDivider />
-                    <MenuItem color="red.400">Cancelar</MenuItem>
-                  </MenuList>
-                </Portal>
-              </Menu>
+              <VotingMenu
+                startVoting={startVoting}
+                cancelVoting={cancelVoting}
+              />
             )}
           </HStack>
         </CardHeader>
@@ -156,56 +144,57 @@ export default function VotingPage({ params }: { params: { id: string } }) {
             <Divider mb={2} />
 
             {isLoading && (
-              <Flex gap={8}>
-                <Skeleton isLoaded={!isLoading} w="18%" height="144px" />
-                <Skeleton isLoaded={!isLoading} w="18%" height="144px" />
+              <Flex flexWrap="wrap" gap={8}>
+                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
+                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
+                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
               </Flex>
             )}
             <Skeleton isLoaded={!isLoading}>
-              <Flex gap={8}>
+              <Grid
+                templateColumns="repeat(auto-fit, minmax(0, 200px))"
+                gap={8}
+              >
                 {getPromiseValue("proposals")?.map?.((proposal, index) => (
-                  <Card
+                  <VStack
                     key={proposal}
-                    boxShadow="sm"
-                    display="flex"
-                    flexDirection="column"
-                    align="center"
-                    py={4}
-                    px={8}
-                    gap={2}
+                    border="2px solid"
+                    borderColor="gray.200"
+                    borderRadius={8}
+                    alignItems="center"
+                    p={4}
+                    spacing={2}
                   >
-                    {/* <Flex
-                      width="full"
-                      justify="flex-end"
-                      transform="translateX(30px)"
+                    <Avatar name={proposal} />
+
+                    <Text
+                      fontSize="lg"
+                      fontWeight="semibold"
+                      textTransform="capitalize"
+                      height="100%"
                     >
-                      <ActionButton
-                        icon={<MdHowToVote />}
-                        label="Votar nessa opção"
-                      />
-                    </Flex> */}
-                    <WrapItem>
-                      <Avatar name={proposal} />
-                    </WrapItem>
-                    <Text fontWeight="medium">{proposal}</Text>
+                      {proposal}
+                    </Text>
                     <DangerPopup
+                      title={`Votar em ${proposal}`}
                       message="Você tem certeza que deseja votar nessa opção?"
                       onConfirm={vote({ proposalIndex: index })}
                     >
                       <Button
                         variant="ghost"
-                        leftIcon={<MdHowToVote />}
-                        w="full"
-                        size="xs"
+                        leftIcon={<Icon as={MdHowToVote} boxSize="4" />}
+                        // w="full"
+                        size="md"
                       >
                         Votar
                       </Button>
                     </DangerPopup>
-                  </Card>
+                  </VStack>
                 ))}
-              </Flex>
+              </Grid>
             </Skeleton>
           </Box>
+
           <Box>
             <Text fontSize="sm" cursor="default">
               Eleitores
@@ -222,7 +211,7 @@ export default function VotingPage({ params }: { params: { id: string } }) {
               <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
                 {getPromiseValue("whiteList")?.map?.((address) => (
                   <Badge
-                    fontSize="md"
+                    fontSize="sm"
                     variant="outline"
                     colorScheme="gray"
                     textTransform="capitalize"
