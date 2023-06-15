@@ -36,29 +36,9 @@ export function CreateVotingForm() {
     async ({ title, proposals, whiteList, deadline }: Voting) => {
       if (!wallet) return "Wallet not found";
 
-      console.log("deadline", deadline, typeof deadline);
-      const inputConsts = [title, proposals, whiteList, deadline];
-
-      // const data = VotingFactoryContract.methods
-      //   .deploy(...inputConsts)
-      //   .encodeABI();
-
-      // const gasPrice = await web3.eth.getGasPrice();
-      // const tx = {
-      //   from: wallet as string,
-      //   data,
-      //   gas: "20000000000", // hard coded for now
-      //   gasPrice,
-      // };
-
-      // const gasLimit = await web3.eth.estimateGas(tx);
-      // tx.gas = (gasLimit * 1.5).toFixed(0);
-
       const gasLimit = await VotingFactoryContract.methods
         .deploy(title, proposals, whiteList, deadline)
         .estimateGas({ from: wallet as string });
-
-      console.log("teste", gasLimit);
 
       const response = await VotingFactoryContract.methods
         .deploy(title, proposals, whiteList, deadline)
@@ -87,45 +67,10 @@ export function CreateVotingForm() {
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
         });
-      // .then((res) => {
-      //   console.log("res", res);
-
-      //   return res;
-      // })
-      // .catch((err) => {
-      //   console.log("err", err);
-
-      //   return Promise.reject(err);
-      // })
-      // .finally(() => {
-      //   console.log("finally");
-      // });
 
       console.log("response", response);
 
       return response;
-
-      // .on("transactionHash", (transactionHash) => {
-      //   console.log(`Transaction hash: ${transactionHash}`);
-      // })
-      // .on("receipt", (receipt) => {
-      //   console.log("receipt", receipt);
-      // })
-      // .on("confirmation", (confirmationNumber, receipt) => {
-      //   console.log("confirmation", confirmationNumber, receipt);
-      // })
-      // .on("error", (error, receipt) => {
-      //   console.error("error TESTE:", error, receipt);
-
-      //   if (toastIdRef.current)
-      //     toast.update(toastIdRef.current, {
-      //       status: "error",
-      //       title: "Erro ao criar votação",
-      //       description: error?.message
-      //         ?.split(":")?.[2]
-      //         ?.replace("revert", ""),
-      //     });
-      // });
     },
     [toast, wallet]
   );

@@ -52,7 +52,6 @@ export default function VotingPage({
 }: {
   params: { contract: string };
 }) {
-  console.log("VotingPage:", params);
   const contract = VotingContract(params.contract);
 
   // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
@@ -123,6 +122,7 @@ export default function VotingPage({
                 variant="solid"
                 colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
                 cursor="default"
+                fontSize="sm"
               >
                 {getPromiseValue("isOpen") ? "Aberta" : ""}
                 {getPromiseValue("isEnded") ? "Fechada" : ""}
@@ -167,14 +167,16 @@ export default function VotingPage({
                 gap={8}
               >
                 {getPromiseValue("proposals")?.map?.((proposal, index) => (
-                  <VStack
+                  <Grid
                     key={proposal}
-                    border="2px solid"
+                    templateRows="auto 1fr auto"
+                    justifyItems="center"
+                    alignItems="center"
+                    gap={2}
+                    p={5}
+                    border="1px solid"
                     borderColor="gray.200"
                     borderRadius={8}
-                    alignItems="center"
-                    p={4}
-                    spacing={2}
                   >
                     <Avatar name={proposal} />
 
@@ -182,7 +184,6 @@ export default function VotingPage({
                       fontSize="lg"
                       fontWeight="semibold"
                       textTransform="capitalize"
-                      height="100%"
                     >
                       {proposal}
                     </Text>
@@ -192,15 +193,18 @@ export default function VotingPage({
                       onConfirm={vote({ proposalIndex: index })}
                     >
                       <Button
-                        variant="ghost"
-                        leftIcon={<Icon as={MdHowToVote} boxSize="4" />}
-                        // w="full"
+                        variant="outline"
+                        leftIcon={<Icon as={MdHowToVote} boxSize={5} />}
+                        w="full"
                         size="md"
                       >
-                        Votar
+                        Votar em
+                        <Text ml={1} fontWeight="bold">
+                          {proposal}
+                        </Text>
                       </Button>
                     </DangerPopup>
-                  </VStack>
+                  </Grid>
                 ))}
               </Grid>
             </Skeleton>

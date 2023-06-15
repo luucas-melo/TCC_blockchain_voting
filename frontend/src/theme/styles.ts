@@ -33,8 +33,8 @@ const templateAreas = {
 export const styles: Theme["styles"] = {
   global: (props: StyleFunctionProps) => ({
     body: {
-      // backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-      backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #e5efff 100%)",
+      backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+      // backgroundImage: "linear-gradient(135deg, #f5f7fa 0%, #e5efff 100%)",
       backgroundSize: "cover",
       backgroundAttachment: "fixed",
       wordBreak: "break-word",

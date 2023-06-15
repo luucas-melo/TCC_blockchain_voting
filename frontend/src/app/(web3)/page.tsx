@@ -37,8 +37,6 @@ export function Home() {
     }
   );
 
-  console.log("votingContractAddresses:", votingContractAddresses?.data);
-
   const allDeployedAddresses = useSWR<string[]>(
     [wallet, "allVotings"],
     VotingFactoryContract.methods.getDeployedContracts().call
@@ -57,11 +55,6 @@ export function Home() {
 
     return allDeployedAddresses.data.map(VotingContract);
   }, [allDeployedAddresses]);
-
-  console.groupCollapsed("Home");
-  console.log("votings ~ votings:", votings);
-  console.log("allVotings ~ allVotings:", allVotings);
-  console.groupEnd();
 
   return (
     <VStack align="stretch" gap={8}>

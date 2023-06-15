@@ -41,8 +41,6 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   const { startVoting, cancelVoting } = useVoting(contract, updateContract);
 
-  console.log("VotingCard ~ data:", data);
-
   const date = useMemo(() => {
     if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
       return "";
@@ -167,7 +165,11 @@ export function VotingCard({ contract }: VotingCardProps) {
           </Text>
           <Divider mb={1} />
           <Skeleton isLoaded={!isLoading} w="75%" height="24px">
-            <Text fontWeight="medium">{date ?? "Loading..."}</Text>
+            {getPromiseValue("isStarted") ? (
+              <Text fontWeight="medium">{date ?? "Loading..."}</Text>
+            ) : (
+              <Text fontWeight="medium">Não iniciada</Text>
+            )}
           </Skeleton>
         </CardFooter>
       </Card>

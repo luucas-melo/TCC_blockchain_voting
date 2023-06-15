@@ -55,9 +55,6 @@ export const getContractData =
     const whiteListPromise = contract.methods
       .getWhiteListedAddresses()
       .call() as Promise<string[]>;
-    // console.log("white", whiteListPromise);
-
-    console.log("methods", contract.methods);
 
     const [
       title,
@@ -82,18 +79,6 @@ export const getContractData =
     ]);
 
     // await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    console.log(
-      "data",
-      title,
-      votingDuration,
-      proposals,
-      isOpen,
-      isCancelled,
-      isEnded,
-      isStarted,
-      whiteList
-    );
 
     return {
       title,
