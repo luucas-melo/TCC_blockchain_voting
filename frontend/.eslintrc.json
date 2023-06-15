@@ -198,7 +198,7 @@
       }
     },
     {
-      "files": ["*/pages/**/*", "middleware.ts", "app/**/*"],
+      "files": ["*/pages/**/*", "middleware.ts", "*/app/**/*"],
       "rules": {
         "import/no-default-export": "off",
         "react/function-component-definition": "off"

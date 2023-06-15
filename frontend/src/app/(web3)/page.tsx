@@ -25,8 +25,6 @@ const Home = () => {
     state: { wallet },
   } = useMetamask();
 
-  // const [votings, setState] = useState<string[]>([]);
-
   const votingContractAddresses = useSWR<string[]>(
     [wallet, "votings"],
     async () => {
@@ -59,7 +57,7 @@ const Home = () => {
     return allDeployedAddresses.data.map(VotingContract);
   }, [allDeployedAddresses]);
 
-  console.group("Home");
+  console.groupCollapsed("Home");
   console.log("votings ~ votings:", votings);
   console.log("allVotings ~ allVotings:", allVotings);
   console.groupEnd();
