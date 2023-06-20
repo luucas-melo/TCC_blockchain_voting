@@ -186,7 +186,12 @@ contract Voting {
         return exists[key];
     }
 
-    function startVoting() public onlyElectionCommission onlyBeforeVotingEnd {
+    function startVoting()
+        public
+        onlyBeforeStart
+        onlyElectionCommission
+        onlyBeforeVotingEnd
+    {
         require(votingCancelled == false, "Voting has been cancelled.");
         votingStartTime = block.timestamp;
         votingStarted = true;
