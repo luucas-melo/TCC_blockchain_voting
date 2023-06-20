@@ -7,12 +7,12 @@ import { web3 } from "./web3";
 
 export const VotingFactoryContract = new web3.eth.Contract(
   VotingFactoryArtifact.abi,
-  Object.entries(VotingFactoryArtifact.networks)[0][1].address
+  Object.entries(VotingFactoryArtifact.networks)[1][1].address
 );
 
 export const VotingContract = (address: string) => {
   try {
-    return new web3.eth.Contract(VotingArtifact.abi, address);
+    return new window.web3.eth.Contract(VotingArtifact.abi, address);
   } catch (error) {
     console.log(error);
 

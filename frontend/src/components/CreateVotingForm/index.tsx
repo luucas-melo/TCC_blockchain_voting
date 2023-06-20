@@ -2,23 +2,28 @@ import {
   Button,
   chakra,
   Heading,
+  Link,
   ToastId,
   useToast,
   VStack,
 } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
 import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 
-import { useMetamask } from "@/hooks/useMetamask";
-import { VotingFactoryContract } from "@/lib/contracts";
+import { VotingFactoryArtifact } from "@/constants/VotingFactory";
+import { formatContractErro } from "@/utils/formatContractErro";
 
 import { Input } from "../FormFields/Input";
 import { Textarea } from "../FormFields/Textarea";
 
 export function CreateVotingForm() {
-  const {
-    state: { wallet },
-  } = useMetamask();
+  // const {
+  //   state: { wallet },
+  //   web3,
+  // } = useMetamask();
+
+  const { account: wallet } = useWeb3React();
 
   const {
     register,
@@ -32,10 +37,17 @@ export function CreateVotingForm() {
   const toast = useToast();
   const toastIdRef = useRef<ToastId>();
 
+  const connector = useWeb3React();
+  console.log("connector", connector);
+
   const createVoting = useCallback(
     async ({ title, proposals, whiteList, deadline }: Voting) => {
       if (!wallet) return "Wallet not found";
 
+      const VotingFactoryContract = new window.web3.eth.Contract(
+        VotingFactoryArtifact.abi,
+        Object.entries(VotingFactoryArtifact.networks)[1][1].address
+      );
       const gasLimit = await VotingFactoryContract.methods
         .deploy(title, proposals, whiteList, deadline)
         .estimateGas({ from: wallet as string });
@@ -52,14 +64,27 @@ export function CreateVotingForm() {
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "error",
-              title: "Erro ao criar votação",
-              description: error?.message
-                ?.split(":")?.[2]
-                ?.replace("revert", ""),
+              title: "Não foi possível criar votação",
+              description: formatContractErro(error as Error),
             });
         })
         .on("transactionHash", (transactionHash) => {
           console.log(`Transaction hash: ${transactionHash}`);
+          toast({
+            status: "loading",
+            duration: null,
+            title: "Aguarde enquanto a votação é criada",
+
+            description: (
+              <Link
+                color="white"
+                href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
+                target="_blank"
+              >
+                Clique aqui para acompanhar a transação
+              </Link>
+            ),
+          });
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
@@ -99,11 +124,10 @@ export function CreateVotingForm() {
           deadline,
         });
         console.log("onSubmit res:", res);
-        if (toastIdRef.current)
-          toast.update(toastIdRef.current, {
-            status: "success",
-            title: "Votação criada com sucesso",
-          });
+        toast({
+          status: "success",
+          title: "Votação criada com sucesso",
+        });
         reset();
       } catch (error) {
         console.error("onSubmit:", error);

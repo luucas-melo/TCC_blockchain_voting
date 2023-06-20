@@ -1,13 +1,13 @@
 "use client";
 
 import { ToastId, useToast } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
 import { useCallback, useRef } from "react";
 import { KeyedMutator } from "swr";
 import Contract from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
-
-import { useMetamask } from "./useMetamask";
+import { formatContractErro } from "@/utils/formatContractErro";
 
 // interface ReturnType {
 //   vote: ({ proposalIndex }: { proposalIndex: number }) => () => Promise<void>;
@@ -18,10 +18,11 @@ export const useVoting = (
   contract: Contract<typeof VotingArtifact.abi>,
   updateContract: KeyedMutator<any>
 ) => {
-  const {
-    state: { wallet },
-  } = useMetamask();
+  // const {
+  //   state: { wallet },
+  // } = useMetamask();
 
+  const { account: wallet } = useWeb3React();
   const toastIdRef = useRef<ToastId>();
   const toast = useToast();
 
@@ -49,24 +50,22 @@ export const useVoting = (
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "error",
-              title: "Erro ao inicar votação",
-              description: error?.message
-                ?.split(":")?.[2]
-                ?.replace("revert", ""),
+              title: "Não foi possível iniciar votação",
+              description: formatContractErro(error as Error),
             });
         })
         .on("transactionHash", (transactionHash) => {
           console.log(`Transaction hash: ${transactionHash}`);
-          updateContract();
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "success",
-              title: "Votação iniciada!",
+              title: "Transação pendente",
               description: `#${transactionHash}`,
             });
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
+          updateContract();
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
@@ -75,14 +74,13 @@ export const useVoting = (
       console.log("response", response);
     } catch (e) {
       console.log("error estimateGas", e);
-
+      console.log("CAUSE", e?.cause);
+      console.log("JSON", e?.toJSON()?.data?.message);
       if (toastIdRef.current)
         toast.update(toastIdRef.current, {
           status: "error",
-          title: "Erro ao inicar votação",
-          description:
-            (e as Error)?.message?.split(":")?.[2]?.replace("revert", "") ||
-            (e as Error)?.message,
+          title: "Não foi possível iniciar votação",
+          description: formatContractErro(e as Error),
         });
     }
   }, [contract, toast, updateContract, wallet]);
@@ -123,7 +121,6 @@ export const useVoting = (
             })
             .on("transactionHash", (transactionHash) => {
               console.log(`Transaction hash: ${transactionHash}`);
-              updateContract();
               if (toastIdRef.current)
                 toast.update(toastIdRef.current, {
                   status: "success",
@@ -133,6 +130,7 @@ export const useVoting = (
             })
             .on("receipt", (receipt) => {
               console.log("receipt", receipt);
+              updateContract();
             })
             .on("confirmation", (confirmation) => {
               console.log("confirmation", confirmation);
@@ -152,7 +150,7 @@ export const useVoting = (
             });
         }
       },
-    [contract, toast, updateContract, wallet]
+    [contract, toast, updateContract]
   );
 
   const cancelVoting = useCallback(async () => {
@@ -187,7 +185,6 @@ export const useVoting = (
         })
         .on("transactionHash", (transactionHash) => {
           console.log(`Transaction hash: ${transactionHash}`);
-          updateContract();
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "success",
@@ -197,6 +194,7 @@ export const useVoting = (
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
+          updateContract();
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
@@ -215,7 +213,7 @@ export const useVoting = (
             (e as Error)?.message,
         });
     }
-  }, [contract, toast, updateContract, wallet]);
+  }, [contract, toast, updateContract]);
 
   return {
     startVoting,

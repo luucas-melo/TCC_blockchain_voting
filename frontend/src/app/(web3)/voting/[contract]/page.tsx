@@ -198,10 +198,7 @@ export default function VotingPage({
                         w="full"
                         size="md"
                       >
-                        Votar em
-                        <Text ml={1} fontWeight="bold">
-                          {proposal}
-                        </Text>
+                        Votar
                       </Button>
                     </DangerPopup>
                   </Grid>

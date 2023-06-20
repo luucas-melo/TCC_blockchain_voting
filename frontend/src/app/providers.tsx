@@ -2,9 +2,11 @@
 
 import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
+import { Web3ReactHooks, Web3ReactProvider } from "@web3-react/core";
+import { MetaMask } from "@web3-react/metamask";
 import { SWRConfig, SWRConfiguration } from "swr";
 
-import { MetamaskProvider } from "@/hooks/useMetamask";
+import { hooks, metaMask } from "@/connectors/MetamaskConnector";
 import { logger } from "@/lib/swrLogger";
 import { theme } from "@/theme";
 
@@ -15,14 +17,16 @@ const swrConfig: SWRConfiguration = {
   shouldRetryOnError: process.env.NODE_ENV !== "development",
 };
 
+const connectors: [MetaMask, Web3ReactHooks][] = [[metaMask, hooks]];
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <MetamaskProvider>
+    <Web3ReactProvider connectors={connectors}>
       <SWRConfig value={swrConfig}>
         <CacheProvider>
           <ChakraProvider theme={theme}>{children}</ChakraProvider>
         </CacheProvider>
       </SWRConfig>
-    </MetamaskProvider>
+    </Web3ReactProvider>
   );
 }

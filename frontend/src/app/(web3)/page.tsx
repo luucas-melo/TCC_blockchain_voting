@@ -12,19 +12,21 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useWeb3React } from "@web3-react/core";
 import Link from "next/link";
 import { useMemo } from "react";
 import { FaPlus } from "react-icons/fa";
 import useSWR from "swr";
 
 import { VotingCard } from "@/components/VotingCard";
-import { useMetamask } from "@/hooks/useMetamask";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
 export function Home() {
-  const {
-    state: { wallet },
-  } = useMetamask();
+  // const {
+  //   state: { wallet },
+  // } = useMetamask();
+
+  const { account: wallet } = useWeb3React();
 
   const votingContractAddresses = useSWR<string[]>(
     [wallet, "votings"],
