@@ -4,6 +4,8 @@ import { useWeb3React } from "@web3-react/core";
 import { useEffect } from "react";
 import Web3 from "web3";
 
+import Login from "./login";
+
 const ethEnabled = async () => {
   if (window.ethereum) {
     await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -30,10 +32,12 @@ export default function Web3Layout({
   // const listen = useListen();
 
   const {
+    account,
     isActive,
+
+    isActivating,
     connector: { provider },
   } = useWeb3React();
-  console.log("active", provider);
 
   useEffect(() => {
     ethEnabled().then((enabled) => console.log("enabled", enabled));
@@ -80,10 +84,17 @@ export default function Web3Layout({
   //   redirect("/login");
   // }
 
+  // if (!isActive && !isActivating && !account) {
+  //   console.log("redirecting to /login");
+  //   redirect("/login");
+  // }
+
   return (
     <>
       {children}
-      {!isActive ? authModal : null}
+      <Login isOpen={!account} />
+      {/* {!isActive ? authModal : null} */}
+      {/* {authModal} */}
     </>
   );
 }

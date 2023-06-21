@@ -24,7 +24,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <Web3ReactProvider connectors={connectors}>
       <SWRConfig value={swrConfig}>
         <CacheProvider>
-          <ChakraProvider theme={theme}>{children}</ChakraProvider>
+          <ChakraProvider
+            theme={theme}
+            toastOptions={{
+              defaultOptions: { position: "top", isClosable: true },
+            }}
+          >
+            {children}
+          </ChakraProvider>
         </CacheProvider>
       </SWRConfig>
     </Web3ReactProvider>

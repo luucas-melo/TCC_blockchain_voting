@@ -22,6 +22,12 @@ import { VotingCard } from "@/components/VotingCard";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
 export function Home() {
+  // const teste = await VotingFactoryContract.methods
+  //   .getDeployedContracts()
+  //   .call();
+
+  // console.log("teste", teste);
+
   // const {
   //   state: { wallet },
   // } = useMetamask();
@@ -117,18 +123,6 @@ export function Home() {
               <Skeleton w="330px" h="240px" />
               <Skeleton w="330px" h="240px" />
             </>
-          )}
-
-          {!allDeployedAddresses?.isLoading && !allVotings?.length && (
-            <VStack spacing={8}>
-              <Heading>
-                Você ainda não criou nenhuma votação. Crie uma agora!
-              </Heading>
-              <Button as={Link} href="/voting/create" size="lg" boxShadow="2xl">
-                <Icon as={FaPlus} mr={2} />
-                Votação
-              </Button>
-            </VStack>
           )}
 
           {allVotings?.map((contract) => (

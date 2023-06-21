@@ -15,6 +15,7 @@ import {
   Heading,
   HStack,
   Icon,
+  Link,
   Skeleton,
   Text,
   VStack,
@@ -95,9 +96,19 @@ export default function VotingPage({
 
   return (
     <Flex direction="column">
-      <Text color="gray.400" fontSize="xs">
+      {/* <Text color="gray.400" fontSize="xs">
         #{contract?.options?.address}
-      </Text>
+      </Text> */}
+      <Link
+        // as={NextLink}
+        // href={`/voting/${contract?.options?.address}` as Route}
+        href={`https://sepolia.etherscan.io/address/${contract?.options?.address}`}
+        target="_blank"
+        color="gray.400"
+        fontSize="xs"
+      >
+        #{contract?.options?.address}
+      </Link>
       <Card
         display="grid"
         gridTemplateRows="auto 1fr auto"

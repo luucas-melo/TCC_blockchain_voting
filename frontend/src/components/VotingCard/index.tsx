@@ -70,8 +70,10 @@ export function VotingCard({ contract }: VotingCardProps) {
   return (
     <Flex direction="column">
       <Link
-        as={NextLink}
-        href={`/voting/${contract?.options?.address}` as Route}
+        // as={NextLink}
+        // href={`/voting/${contract?.options?.address}` as Route}
+        href={`https://sepolia.etherscan.io/address/${contract?.options?.address}`}
+        target="_blank"
         color="gray.400"
         fontSize="xs"
       >

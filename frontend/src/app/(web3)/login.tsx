@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  ModalProps,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -19,10 +20,13 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 
 import { metaMask } from "@/connectors/MetamaskConnector";
+import { VotingFactoryArtifact } from "@/constants/VotingFactory";
 
 const onClose = () => {};
 
-const Login = () => {
+interface LoginProps extends Partial<ModalProps> {}
+
+const Login = (props: LoginProps) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -39,10 +43,19 @@ const Login = () => {
   const connect = useCallback(async () => {
     try {
       console.log("ANTES");
-      await metaMask.activate();
+      console.log(Number(Object.keys(VotingFactoryArtifact.networks)[1]));
+      await metaMask.activate(
+        Number(Object.keys(VotingFactoryArtifact.networks)[1])
+      );
       console.log("DEPOIS");
     } catch (e) {
       console.log("error", e);
+      // Already processing eth_requestAccounts. Please wait.
+
+      // User rejected the request.
+      // User rejected the request with method 'eth_requestAccounts'.
+      // User closed the window.
+      // User closed the modal.
     }
   }, []);
   // const {
@@ -79,11 +92,11 @@ const Login = () => {
   //   dispatch({ type: "disconnect" });
   // };
 
-  const background = useColorModeValue("blackAlpha.700", "blackAlpha.200");
+  const background = useColorModeValue("blackAlpha.700", "blackAlpha.300");
 
   return (
-    <Modal isCentered isOpen onClose={onClose}>
-      <ModalOverlay background={background} backdropFilter="blur(4px)" />
+    <Modal isCentered isOpen onClose={onClose} {...props}>
+      <ModalOverlay background={background} backdropFilter="blur(8px)" />
       <ModalContent>
         <ModalHeader>Autenticação</ModalHeader>
         <ModalCloseButton />

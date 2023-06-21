@@ -12,7 +12,7 @@ import { useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 import { VotingFactoryArtifact } from "@/constants/VotingFactory";
-import { formatContractErro } from "@/utils/formatContractErro";
+import { formatContractError } from "@/utils/formatContractError";
 
 import { Input } from "../FormFields/Input";
 import { Textarea } from "../FormFields/Textarea";
@@ -65,32 +65,49 @@ export function CreateVotingForm() {
             toast.update(toastIdRef.current, {
               status: "error",
               title: "Não foi possível criar votação",
-              description: formatContractErro(error as Error),
+              description: formatContractError(error as Error),
             });
         })
         .on("transactionHash", (transactionHash) => {
           console.log(`Transaction hash: ${transactionHash}`);
-          toast({
-            status: "loading",
-            duration: null,
-            title: "Aguarde enquanto a votação é criada",
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "loading",
+              duration: null,
+              title: "Aguarde enquanto a votação é criada",
 
-            description: (
-              <Link
-                color="white"
-                href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
-                target="_blank"
-              >
-                Clique aqui para acompanhar a transação
-              </Link>
-            ),
-          });
+              description: (
+                <Link
+                  color="white"
+                  href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
+                  target="_blank"
+                >
+                  Clique aqui para acompanhar a transação
+                </Link>
+              ),
+            });
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "success",
+              variant: "subtle",
+              title: "Votação criada com sucesso",
+              description: (
+                <Link
+                  color="white"
+                  href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
+                  target="_blank"
+                >
+                  Clique aqui para visualizar bloco na blockchain
+                </Link>
+              ),
+              isClosable: true,
+            });
         });
 
       console.log("response", response);
@@ -114,8 +131,9 @@ export function CreateVotingForm() {
         toastIdRef.current = toast({
           status: "info",
           title: "Criando votação",
-          description: "Aguarde enquanto a votação é criada",
+          description: "Por favor, confirme a transação na sua carteira",
           position: "top",
+          duration: null,
         });
         const res = await createVoting({
           title,
@@ -124,10 +142,11 @@ export function CreateVotingForm() {
           deadline,
         });
         console.log("onSubmit res:", res);
-        toast({
-          status: "success",
-          title: "Votação criada com sucesso",
-        });
+
+        // toast.update(toastIdRef.current,{
+        //   status: "success",
+        //   title: "Votação criada com sucesso",
+        // });
         reset();
       } catch (error) {
         console.error("onSubmit:", error);
