@@ -1,5 +1,6 @@
 import {
   Badge,
+  Box,
   Card,
   CardBody,
   CardFooter,
@@ -7,7 +8,6 @@ import {
   Divider,
   Flex,
   Heading,
-  HStack,
   Link,
   Skeleton,
   Text,
@@ -68,7 +68,7 @@ export function VotingCard({ contract }: VotingCardProps) {
       >
         <CardHeader
           display="flex"
-          alignItems="center"
+          alignItems="flex-start"
           justifyContent="space-between"
           pb={0}
         >
@@ -85,8 +85,9 @@ export function VotingCard({ contract }: VotingCardProps) {
             </Skeleton>
             <Skeleton isLoaded={!isLoading && !error}>
               <Badge
-                variant="solid"
+                variant={data?.isStarted ? "solid" : "subtle"}
                 colorScheme={data?.isOpen ? "green" : "red"}
+                fontSize="small"
                 cursor="default"
               >
                 {data?.isStarted ? "" : "Não iniciada"}
@@ -97,7 +98,7 @@ export function VotingCard({ contract }: VotingCardProps) {
             </Skeleton>
           </VStack>
 
-          <HStack transform="translateX(4px)">
+          <Box transform="translate(6px, -4px)">
             {!isLoading && (
               <VotingMenu
                 startVoting={startVoting}
@@ -105,7 +106,7 @@ export function VotingCard({ contract }: VotingCardProps) {
                 cancelVoting={cancelVoting}
               />
             )}
-          </HStack>
+          </Box>
         </CardHeader>
 
         <CardBody py={0}>

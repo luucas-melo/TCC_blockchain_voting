@@ -2,6 +2,7 @@
 
 import {
   Button,
+  ButtonGroup,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -116,12 +117,14 @@ export function EditVotingModal(props: EditVotingModalProps) {
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="ghost" onClick={router.back}>
-            Cancelar
-          </Button>
-          <Button type="submit" form="voting-form" size="lg">
-            Confirmar
-          </Button>
+          <ButtonGroup size="lg">
+            <Button variant="ghost" colorScheme="gray" onClick={router.back}>
+              Cancelar
+            </Button>
+            <Button type="submit" form="voting-form">
+              Confirmar
+            </Button>
+          </ButtonGroup>
         </ModalFooter>
       </ModalContent>
     </Modal>

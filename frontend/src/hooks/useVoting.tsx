@@ -3,7 +3,7 @@
 import { Link, ToastId, useToast } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { useCallback, useRef } from "react";
-import useSWR, { KeyedMutator } from "swr";
+import useSWR from "swr";
 import Contract from "web3-eth-contract";
 
 import { TransactionPendingToast } from "@/components/TransationPendingToast";
@@ -11,10 +11,7 @@ import { VotingArtifact } from "@/constants/Voting";
 import { getContractData } from "@/lib/contracts";
 import { formatContractError } from "@/utils/formatContractError";
 
-export const useVoting = (
-  contract: Contract<typeof VotingArtifact.abi>,
-  updateContract?: KeyedMutator<any>
-) => {
+export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
   const { account: wallet } = useWeb3React();
   const toastIdRef = useRef<ToastId>();
   const toast = useToast();
@@ -71,7 +68,7 @@ export const useVoting = (
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
-          updateContract?.();
+          votingData?.mutate?.();
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "success",
@@ -101,7 +98,7 @@ export const useVoting = (
     }
 
     console.groupEnd();
-  }, [contract, toast, updateContract, wallet]);
+  }, [contract, toast, wallet]);
 
   const vote = useCallback(
     ({ proposalIndex }: { proposalIndex: number }) =>
@@ -150,7 +147,7 @@ export const useVoting = (
             })
             .on("receipt", (receipt) => {
               console.log("receipt", receipt);
-              updateContract?.();
+              votingData?.mutate?.();
             })
             .on("confirmation", (confirmation) => {
               console.log("confirmation", confirmation);
@@ -184,7 +181,7 @@ export const useVoting = (
             });
         }
       },
-    [contract, toast, updateContract]
+    [contract, toast, votingData]
   );
 
   const editVoting = useCallback(
@@ -233,7 +230,7 @@ export const useVoting = (
           })
           .on("receipt", (receipt) => {
             console.log("receipt", receipt);
-            updateContract?.();
+            votingData?.mutate?.();
           })
           .on("confirmation", (confirmation) => {
             console.log("confirmation", confirmation);
@@ -267,7 +264,7 @@ export const useVoting = (
 
       console.groupEnd();
     },
-    [contract, toast, updateContract, wallet]
+    [contract, toast, wallet]
   );
 
   const cancelVoting = useCallback(async () => {
@@ -313,7 +310,7 @@ export const useVoting = (
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
-          updateContract?.();
+          votingData?.mutate?.();
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
@@ -343,7 +340,7 @@ export const useVoting = (
           description: formatContractError(e),
         });
     }
-  }, [contract, toast, updateContract, wallet]);
+  }, [contract, toast, wallet]);
 
   return {
     ...votingData,

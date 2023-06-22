@@ -25,7 +25,7 @@ export function VotingMenu(props: VotingMenuProps) {
     <Menu autoSelect={false} isLazy>
       <MenuButton
         as={ActionButton}
-        icon={<Icon as={BsThreeDotsVertical} />}
+        icon={<Icon as={BsThreeDotsVertical} boxSize={5} />}
         colorScheme="gray"
       />
       <Portal>

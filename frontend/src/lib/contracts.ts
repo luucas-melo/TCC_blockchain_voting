@@ -12,8 +12,10 @@ export const VotingFactoryContract = new web3.eth.Contract(
 
 export const VotingContract = (address: string) => {
   try {
-    // return new window.web3.eth.Contract(VotingArtifact.abi, address);
-    return new web3.eth.Contract(VotingArtifact.abi, address);
+    const provider = typeof window !== "undefined" ? window.web3 : web3;
+
+    return new provider.eth.Contract(VotingArtifact.abi, address);
+    // return new web3.eth.Contract(VotingArtifact.abi, address);
   } catch (error) {
     console.log(error);
 
