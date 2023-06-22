@@ -12,14 +12,16 @@ export const VotingFactoryContract = new web3.eth.Contract(
 
 export const VotingContract = (address: string) => {
   try {
-    return new window.web3.eth.Contract(VotingArtifact.abi, address);
-    // return new web3.eth.Contract(VotingArtifact.abi, address);
+    // return new window.web3.eth.Contract(VotingArtifact.abi, address);
+    return new web3.eth.Contract(VotingArtifact.abi, address);
   } catch (error) {
     console.log(error);
 
     return {} as Contract<typeof VotingArtifact.abi>;
   }
 };
+
+type PromiseResult<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
 
 export const getContractData =
   (contract: Contract<typeof VotingArtifact.abi>) => async () => {
@@ -58,15 +60,15 @@ export const getContractData =
       .call() as Promise<string[]>;
 
     const [
-      title,
-      votingDuration,
-      whiteList,
-      proposals,
-      isOpen,
-      isCancelled,
-      isEnded,
-      isStarted,
-      electionChief,
+      titleResult,
+      votingDurationResult,
+      whiteListResult,
+      proposalsResult,
+      isOpenResult,
+      isCancelledResult,
+      isEndedResult,
+      isStartedResult,
+      electionChiefResult,
     ] = await Promise.allSettled([
       titlePromise,
       votingDurationPromise,
@@ -78,6 +80,25 @@ export const getContractData =
       isStartedPromise,
       electionChiefPromise,
     ]);
+
+    function handleSettledPromise<T>(result: PromiseResult<T>): T {
+      if (result.status === "fulfilled") {
+        return result.value;
+      }
+
+      console.error("Promise rejected: ", result?.reason);
+      throw new Error("Promise rejected", { cause: result?.reason });
+    }
+
+    const title = handleSettledPromise(titleResult);
+    const votingDuration = handleSettledPromise(votingDurationResult);
+    const whiteList = handleSettledPromise(whiteListResult);
+    const proposals = handleSettledPromise(proposalsResult);
+    const isOpen = handleSettledPromise(isOpenResult);
+    const isCancelled = handleSettledPromise(isCancelledResult);
+    const isEnded = handleSettledPromise(isEndedResult);
+    const isStarted = handleSettledPromise(isStartedResult);
+    const electionChief = handleSettledPromise(electionChiefResult);
 
     // await new Promise((resolve) => setTimeout(resolve, 2000));
 
