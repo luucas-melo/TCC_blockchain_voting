@@ -22,7 +22,7 @@ const nextConfig = (phase) => ({
     ignoreDuringBuilds: true,
   },
   experimental: {
-    typedRoutes: true,
+    typedRoutes: process.env.TYPED_ROUTES === "true",
   },
 });
 

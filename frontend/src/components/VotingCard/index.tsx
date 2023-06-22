@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react";
 import type { Route } from "next";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { Contract } from "web3-eth-contract";
@@ -32,6 +33,8 @@ interface VotingCardProps {
 
 export function VotingCard({ contract }: VotingCardProps) {
   const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
+
+  const router = useRouter();
 
   const {
     data,
@@ -118,14 +121,10 @@ export function VotingCard({ contract }: VotingCardProps) {
           </Skeleton>
 
           <HStack transform="translateX(4px)">
-            {/* <Skeleton isLoaded={!isLoading}>
-              <Badge colorScheme={getPromiseValue("isOpen") ? "green" : "red"}>
-                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
-              </Badge>
-            </Skeleton> */}
             {!isLoading && (
               <VotingMenu
                 startVoting={startVoting}
+                onEdit={() => router.push(`/${contract.options.address}/edit`)}
                 cancelVoting={cancelVoting}
               />
             )}

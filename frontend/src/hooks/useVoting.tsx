@@ -12,7 +12,7 @@ import { formatContractError } from "@/utils/formatContractError";
 
 export const useVoting = (
   contract: Contract<typeof VotingArtifact.abi>,
-  updateContract: KeyedMutator<any>
+  updateContract?: KeyedMutator<any>
 ) => {
   const { account: wallet } = useWeb3React();
   const toastIdRef = useRef<ToastId>();
@@ -65,14 +65,14 @@ export const useVoting = (
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
-          updateContract();
+          updateContract?.();
           if (toastIdRef.current)
             toast.update(toastIdRef.current, {
               status: "success",
               title: "Votação iniciada com sucesso!",
               description: (
                 <Link
-                  color="white"
+                  // color="white"
                   href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
                   target="_blank"
                 >
@@ -144,7 +144,7 @@ export const useVoting = (
             })
             .on("receipt", (receipt) => {
               console.log("receipt", receipt);
-              updateContract();
+              updateContract?.();
             })
             .on("confirmation", (confirmation) => {
               console.log("confirmation", confirmation);
@@ -154,7 +154,7 @@ export const useVoting = (
                   title: "Voto realizado com sucesso!",
                   description: (
                     <Link
-                      color="white"
+                      // color="white"
                       href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
                       target="_blank"
                     >
@@ -180,6 +180,84 @@ export const useVoting = (
       },
     [contract, toast, updateContract]
   );
+
+  const editVoting = useCallback(async (data: Voting) => {
+    console.group("EDIT VOTING");
+
+    try {
+      toastIdRef.current = toast({
+        status: "info",
+        title: "Editando votação",
+        description: "Por favor, confirme a transação na sua carteira",
+        duration: null,
+      });
+
+      const gasLimit = await contract.methods
+        .editTitle(data.title)
+        .estimateGas({
+          from: wallet as string,
+        });
+
+      const response = await contract.methods
+        .editTitle(data.title)
+        .send({
+          from: wallet as string,
+          gas: (gasLimit * BigInt(2)).toString(),
+        })
+        .on("error", (error) => {
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "error",
+              title: "Não foi possível editar a votação",
+              description: formatContractError(error),
+            });
+        })
+        .on("transactionHash", (transactionHash) => {
+          console.log(`Transaction hash: ${transactionHash}`);
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              render: (props) => (
+                <TransactionPendingToast
+                  transactionHash={transactionHash}
+                  {...props}
+                />
+              ),
+            });
+        })
+        .on("receipt", (receipt) => {
+          console.log("receipt", receipt);
+          updateContract?.();
+        })
+        .on("confirmation", (confirmation) => {
+          console.log("confirmation", confirmation);
+          if (toastIdRef.current)
+            toast.update(toastIdRef.current, {
+              status: "success",
+              title: "Votação editada com sucesso!",
+              description: (
+                <Link
+                  // color="white"
+                  href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
+                  target="_blank"
+                >
+                  Clique aqui para visualizar bloco na blockchain
+                </Link>
+              ),
+            });
+        });
+
+      console.log("response", response);
+    } catch (e) {
+      if (toastIdRef.current)
+        toast.update(toastIdRef.current, {
+          status: "error",
+          title: "Não foi possível editar a votação",
+          description: formatContractError(e),
+        });
+    }
+
+    console.groupEnd();
+  }, []);
 
   const cancelVoting = useCallback(async () => {
     toastIdRef.current = toast({
@@ -224,7 +302,7 @@ export const useVoting = (
         })
         .on("receipt", (receipt) => {
           console.log("receipt", receipt);
-          updateContract();
+          updateContract?.();
         })
         .on("confirmation", (confirmation) => {
           console.log("confirmation", confirmation);
@@ -234,7 +312,7 @@ export const useVoting = (
               title: "Votação cancelada com sucesso!",
               description: (
                 <Link
-                  color="white"
+                  // color="white"
                   href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
                   target="_blank"
                 >
@@ -260,5 +338,6 @@ export const useVoting = (
     startVoting,
     vote,
     cancelVoting,
+    editVoting,
   };
 };

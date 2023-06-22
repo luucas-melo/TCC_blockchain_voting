@@ -22,16 +22,6 @@ import { VotingCard } from "@/components/VotingCard";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
 export function Home() {
-  // const teste = await VotingFactoryContract.methods
-  //   .getDeployedContracts()
-  //   .call();
-
-  // console.log("teste", teste);
-
-  // const {
-  //   state: { wallet },
-  // } = useMetamask();
-
   const { account: wallet } = useWeb3React();
 
   const votingContractAddresses = useSWR<string[]>(

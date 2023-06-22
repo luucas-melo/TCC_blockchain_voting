@@ -15,10 +15,11 @@ import { DangerPopup } from "../DangerPopup";
 interface VotingMenuProps {
   startVoting: () => Promise<void>;
   cancelVoting: () => Promise<void>;
+  onEdit: () => void;
 }
 
 export function VotingMenu(props: VotingMenuProps) {
-  const { startVoting, cancelVoting } = props;
+  const { startVoting, cancelVoting, onEdit } = props;
 
   return (
     <Menu autoSelect={false} isLazy>
@@ -29,7 +30,7 @@ export function VotingMenu(props: VotingMenuProps) {
       />
       <Portal>
         <MenuList>
-          <MenuItem>Editar</MenuItem>
+          <MenuItem onClick={onEdit}>Editar</MenuItem>
           <MenuItem onClick={startVoting}>Iniciar</MenuItem>
           <MenuDivider />
           <DangerPopup

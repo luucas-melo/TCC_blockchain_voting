@@ -14,7 +14,7 @@ export function TransactionPendingToast(props: TransactionPendingToastProps) {
       title="Aguarde a confirmação da transação"
       description={
         <Link
-          color="white"
+          // color="white"
           href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
           target="_blank"
         >

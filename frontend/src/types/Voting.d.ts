@@ -5,9 +5,9 @@ interface Voting {
   deadline: number;
 }
 
-interface RegisterVoting {
+type RegisterVotingValues = {
   title: string;
   proposals: string;
   whiteList: string;
   deadline: string;
-}
+};

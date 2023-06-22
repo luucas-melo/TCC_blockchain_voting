@@ -20,6 +20,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { MdHowToVote } from "react-icons/md";
 import useSWR from "swr";
@@ -27,32 +28,38 @@ import useSWR from "swr";
 import { DangerPopup } from "@/components/DangerPopup";
 import { VotingMenu } from "@/components/VotingMenu";
 import { useVoting } from "@/hooks/useVoting";
-import { getContractData, VotingContract } from "@/lib/contracts";
+import {
+  getContractData,
+  VotingContract,
+  VotingFactoryContract,
+} from "@/lib/contracts";
 
-// export async function generateStaticParams() {
-//   const web3 = new Web3("http://127.0.0.1:8545");
+export async function generateStaticParams() {
+  // const web3 = new Web3("http://127.0.0.1:8545");
 
-//   const VotingFactoryContract = new web3.eth.Contract(
-//     VotingFactoryArtifact.abi,
-//     Object.entries(VotingFactoryArtifact.networks)[0][1].address
-//   );
+  // const VotingFactoryContract = new web3.eth.Contract(
+  //   VotingFactoryArtifact.abi,
+  //   Object.entries(VotingFactoryArtifact.networks)[0][1].address
+  // );
 
-//   const contracts = await VotingFactoryContract.methods
-//     .getDeployedContracts()
-//     .call();
+  const contracts = await VotingFactoryContract.methods
+    .getDeployedContracts()
+    .call();
 
-//   console.log("generateStaticParams ~ contracts:", contracts);
+  console.log("generateStaticParams ~ contracts:", contracts);
 
-//   return contracts.map((contract) => ({
-//     contract,
-//   }));
-// }
+  return contracts.map((contract) => ({
+    contract,
+  }));
+}
 
 export default function VotingPage({
   params,
 }: {
   params: { contract: string };
 }) {
+  const router = useRouter();
+
   const contract = VotingContract(params.contract);
 
   // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
@@ -153,6 +160,9 @@ export default function VotingPage({
               <VotingMenu
                 startVoting={startVoting}
                 cancelVoting={cancelVoting}
+                onEdit={() =>
+                  router.push(`/voting/${contract?.options?.address}/edit`)
+                }
               />
             )}
           </HStack>
