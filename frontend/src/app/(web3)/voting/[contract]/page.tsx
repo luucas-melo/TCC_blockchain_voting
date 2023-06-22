@@ -30,13 +30,6 @@ import { useVoting } from "@/hooks/useVoting";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
 export async function generateStaticParams() {
-  // const web3 = new Web3("http://127.0.0.1:8545");
-
-  // const VotingFactoryContract = new web3.eth.Contract(
-  //   VotingFactoryArtifact.abi,
-  //   Object.entries(VotingFactoryArtifact.networks)[0][1].address
-  // );
-
   const contracts = await VotingFactoryContract.methods
     .getDeployedContracts()
     .call();

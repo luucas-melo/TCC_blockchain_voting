@@ -108,7 +108,7 @@ export function EditVotingModal(props: EditVotingModalProps) {
 
   return (
     <Modal isOpen onClose={router.back}>
-      <ModalOverlay />
+      <ModalOverlay backdropFilter="blur(8px)" />
       <ModalContent>
         <ModalHeader>Editar Votação</ModalHeader>
         <ModalCloseButton />

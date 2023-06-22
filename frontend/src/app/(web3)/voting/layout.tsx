@@ -1,7 +1,5 @@
 "use client";
 
-import { Heading } from "@chakra-ui/react";
-
 export default function Web3Layout({
   children,
   modal,
@@ -12,7 +10,6 @@ export default function Web3Layout({
   return (
     <>
       {children}
-      <Heading color="red">VOTING LAYOUT</Heading>
       {modal}
     </>
   );

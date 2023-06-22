@@ -1,5 +1,21 @@
 import { EditVotingModal } from "@/components/EditVotingModal";
-import { getContractData, VotingContract } from "@/lib/contracts";
+import {
+  getContractData,
+  VotingContract,
+  VotingFactoryContract,
+} from "@/lib/contracts";
+
+export async function generateStaticParams() {
+  const contracts = await VotingFactoryContract.methods
+    .getDeployedContracts()
+    .call();
+
+  console.log("generateStaticParams ~ contracts:", contracts);
+
+  return contracts.map((contract) => ({
+    contract,
+  }));
+}
 
 export default async function EditVoting({
   params,

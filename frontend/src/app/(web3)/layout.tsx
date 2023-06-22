@@ -1,6 +1,5 @@
 "use client";
 
-import { Heading } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { useEffect } from "react";
 
@@ -27,9 +26,7 @@ export default function Web3Layout({
     <>
       {children}
       <Login isOpen={!account} />
-      <Heading>(WEB3)(Start)</Heading>
       {modal}
-      <Heading>(WEB3)(End)</Heading>
     </>
   );
 }

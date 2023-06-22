@@ -56,7 +56,7 @@ export function DangerPopup(props: DangerPopupProps) {
       <PopoverTrigger>{children}</PopoverTrigger>
 
       <Portal>
-        <PopoverContent borderRadius="base" boxShadow="2xl">
+        <PopoverContent borderRadius="base" boxShadow="da">
           <PopoverArrow />
           <PopoverCloseButton top={2.5} right={2} />
 
@@ -79,16 +79,11 @@ export function DangerPopup(props: DangerPopupProps) {
 
           <PopoverFooter borderBottomRadius="base">
             <ButtonGroup
-              size="sm"
+              size="md"
               display="flex"
               justifyContent="space-between"
             >
-              <Button
-                variant="ghost"
-                colorScheme="gray"
-                // color="white"
-                onClick={onClose}
-              >
+              <Button variant="ghost" colorScheme="gray" onClick={onClose}>
                 Cancelar
               </Button>
               <Button
