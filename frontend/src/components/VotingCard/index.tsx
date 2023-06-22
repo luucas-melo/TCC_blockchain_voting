@@ -17,13 +17,11 @@ import {
 import type { Route } from "next";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
-import useSWR from "swr";
+import { useMemo } from "react";
 import { Contract } from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
 import { useVoting } from "@/hooks/useVoting";
-import { getContractData } from "@/lib/contracts";
 
 import { VotingMenu } from "../VotingMenu";
 
@@ -36,39 +34,16 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   const router = useRouter();
 
-  const {
-    data,
-    isLoading,
-    mutate: updateContract,
-  } = useSWR(contract?.options?.address, getContractData(contract));
-
-  const { startVoting, cancelVoting } = useVoting(contract, updateContract);
+  const { data, isLoading, error, startVoting, cancelVoting } =
+    useVoting(contract);
 
   const date = useMemo(() => {
-    if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
-      return "";
+    if (!data?.votingDuration) return "";
 
-    const time = new Date(Number(data.votingDuration.value) * 1000);
+    const time = new Date(Number(data.votingDuration) * 1000);
 
     return time.toLocaleString();
   }, [data]);
-
-  const getPromiseValue = useCallback(
-    (dataKey: string) => {
-      if (!data) return undefined;
-
-      type DataKeys = keyof typeof data;
-
-      if (data[dataKey as DataKeys].status === "fulfilled")
-        return (data[dataKey as DataKeys] as PromiseFulfilledResult<string[]>)
-          .value;
-
-      return null;
-    },
-    [data]
-  );
-
-  // console.log("VotingCard ~ getPromiseValue:", getPromiseValue("title"));
 
   return (
     <Flex direction="column">
@@ -97,28 +72,30 @@ export function VotingCard({ contract }: VotingCardProps) {
           justifyContent="space-between"
           pb={0}
         >
-          <Skeleton isLoaded={!isLoading}>
-            <VStack align="start" spacing={1}>
+          <VStack align="start" spacing={1}>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Heading
                 as={NextLink}
                 href={`/voting/${contract?.options?.address}` as Route}
                 size="md"
                 textTransform="capitalize"
               >
-                {getPromiseValue("title") ?? "Carregando..."}
+                {data?.title ?? "Carregando..."}
               </Heading>
+            </Skeleton>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Badge
                 variant="solid"
-                colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
+                colorScheme={data?.isOpen ? "green" : "red"}
                 cursor="default"
               >
-                {getPromiseValue("isStarted") ? "" : "Não iniciada"}
-                {getPromiseValue("isOpen") ? "Aberta" : ""}
-                {getPromiseValue("isEnded") ? "Fechada" : ""}
-                {getPromiseValue("isCancelled") ? "Cancelada" : ""}
+                {data?.isStarted ? "" : "Não iniciada"}
+                {data?.isOpen ? "Aberta" : ""}
+                {data?.isEnded ? "Fechada" : ""}
+                {data?.isCancelled ? "Cancelada" : ""}
               </Badge>
-            </VStack>
-          </Skeleton>
+            </Skeleton>
+          </VStack>
 
           <HStack transform="translateX(4px)">
             {!isLoading && (
@@ -137,15 +114,15 @@ export function VotingCard({ contract }: VotingCardProps) {
           </Text>
           <Divider mb={2} />
 
-          {isLoading && (
+          {(isLoading || error) && (
             <Flex justifyContent="space-between">
-              <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
-              <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
+              <Skeleton isLoaded={!isLoading && !error} w="45%" height="24px" />
+              <Skeleton isLoaded={!isLoading && !error} w="45%" height="24px" />
             </Flex>
           )}
-          <Skeleton isLoaded={!isLoading}>
+          <Skeleton isLoaded={!isLoading && !error}>
             <Flex flexWrap="wrap" gap={4}>
-              {getPromiseValue("proposals")?.map?.((proposal) => (
+              {data?.proposals?.map?.((proposal) => (
                 <Badge
                   fontSize="md"
                   variant="outline"
@@ -165,8 +142,8 @@ export function VotingCard({ contract }: VotingCardProps) {
             Duração
           </Text>
           <Divider mb={1} />
-          <Skeleton isLoaded={!isLoading} w="75%" height="24px">
-            {getPromiseValue("isStarted") ? (
+          <Skeleton isLoaded={!isLoading && !error} w="75%" height="24px">
+            {data?.isStarted ? (
               <Text fontWeight="medium">{date ?? "Loading..."}</Text>
             ) : (
               <Text fontWeight="medium">Não iniciada</Text>

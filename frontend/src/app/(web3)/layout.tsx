@@ -11,11 +11,9 @@ import Login from "./login";
 export default function Web3Layout({
   children,
   modal,
-  modaltest,
 }: {
   children: React.ReactNode;
-  modal?: React.ReactNode;
-  modaltest?: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const { account } = useWeb3React();
 
@@ -29,10 +27,8 @@ export default function Web3Layout({
     <>
       {children}
       <Login isOpen={!account} />
-      <Heading>(WEB3)(Start2)</Heading>
+      <Heading>(WEB3)(Start)</Heading>
       {modal}
-      <Heading>(WEB3)(Mid)</Heading>
-      {modaltest}
       <Heading>(WEB3)(End)</Heading>
     </>
   );

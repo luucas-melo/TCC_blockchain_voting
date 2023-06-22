@@ -21,18 +21,13 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { MdHowToVote } from "react-icons/md";
-import useSWR from "swr";
 
 import { DangerPopup } from "@/components/DangerPopup";
 import { VotingMenu } from "@/components/VotingMenu";
 import { useVoting } from "@/hooks/useVoting";
-import {
-  getContractData,
-  VotingContract,
-  VotingFactoryContract,
-} from "@/lib/contracts";
+import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
 
 export async function generateStaticParams() {
   // const web3 = new Web3("http://127.0.0.1:8545");
@@ -64,40 +59,24 @@ export default function VotingPage({
 
   // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
 
-  const {
-    data,
-    isLoading,
-    mutate: updateContract,
-  } = useSWR(contract?.options?.address, getContractData(contract));
+  // const {
+  //   data,
+  //   isLoading,
+  //   mutate: updateContract,
+  // } = useSWR(contract?.options?.address, getContractData(contract));
 
-  const { startVoting, vote, cancelVoting } = useVoting(
-    contract,
-    updateContract
+  const { data, isLoading, error, startVoting, vote, cancelVoting } = useVoting(
+    contract
+    // updateContract
   );
 
   const date = useMemo(() => {
-    if (!data?.votingDuration || data?.votingDuration?.status === "rejected")
-      return "";
+    if (!data?.votingDuration) return "";
 
-    const time = new Date(Number(data.votingDuration.value) * 1000);
+    const time = new Date(Number(data.votingDuration) * 1000);
 
     return time.toLocaleString();
   }, [data]);
-
-  const getPromiseValue = useCallback(
-    (dataKey: string) => {
-      if (!data) return undefined;
-
-      type DataKeys = keyof typeof data;
-
-      if (data?.[dataKey as DataKeys]?.status === "fulfilled")
-        return (data[dataKey as DataKeys] as PromiseFulfilledResult<string[]>)
-          .value;
-
-      return null;
-    },
-    [data]
-  );
 
   if (!contract) return null;
 
@@ -131,32 +110,35 @@ export default function VotingPage({
           justifyContent="space-between"
           pb={0}
         >
-          <Skeleton isLoaded={!isLoading}>
-            <VStack align="start" spacing={1}>
+          <VStack align="start" spacing={1}>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Heading size="md" textTransform="capitalize">
-                {getPromiseValue("title") ?? "Carregando..."}
+                {data?.title ?? "Carregando..."}
               </Heading>
+            </Skeleton>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Badge
                 variant="solid"
-                colorScheme={getPromiseValue("isOpen") ? "green" : "red"}
+                colorScheme={data?.isOpen ? "green" : "red"}
                 cursor="default"
                 fontSize="sm"
               >
-                {getPromiseValue("isOpen") ? "Aberta" : ""}
-                {getPromiseValue("isEnded") ? "Fechada" : ""}
-                {getPromiseValue("isCancelled") ? "Cancelada" : ""}
+                {data?.isStarted ? "" : "Não iniciada"}
+                {data?.isOpen ? "Aberta" : ""}
+                {data?.isEnded ? "Fechada" : ""}
+                {data?.isCancelled ? "Cancelada" : ""}
               </Badge>
-            </VStack>
-          </Skeleton>
+            </Skeleton>
+          </VStack>
 
           <HStack transform="translateX(4px)">
-            {/* <Skeleton isLoaded={!isLoading}>
-              <Badge colorScheme={getPromiseValue("isOpen") ? "green" : "red"}>
-                {getPromiseValue("isOpen") ? "Aberta" : "Fechada"}
+            {/* <Skeleton isLoaded={!isLoading && !error}>
+              <Badge colorScheme={data?.isOpen ? "green" : "red"}>
+                {data?.isOpen ? "Aberta" : "Fechada"}
               </Badge>
             </Skeleton> */}
 
-            {!isLoading && (
+            {!isLoading && !error && (
               <VotingMenu
                 startVoting={startVoting}
                 cancelVoting={cancelVoting}
@@ -177,17 +159,29 @@ export default function VotingPage({
 
             {isLoading && (
               <Flex flexWrap="wrap" gap={8}>
-                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
-                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
-                <Skeleton isLoaded={!isLoading} w="200px" height="163px" />
+                <Skeleton
+                  isLoaded={!isLoading && !error}
+                  w="200px"
+                  height="163px"
+                />
+                <Skeleton
+                  isLoaded={!isLoading && !error}
+                  w="200px"
+                  height="163px"
+                />
+                <Skeleton
+                  isLoaded={!isLoading && !error}
+                  w="200px"
+                  height="163px"
+                />
               </Flex>
             )}
-            <Skeleton isLoaded={!isLoading}>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Grid
                 templateColumns="repeat(auto-fit, minmax(0, 200px))"
                 gap={8}
               >
-                {getPromiseValue("proposals")?.map?.((proposal, index) => (
+                {data?.proposals?.map?.((proposal, index) => (
                   <Grid
                     key={proposal}
                     templateRows="auto 1fr auto"
@@ -236,13 +230,21 @@ export default function VotingPage({
 
             {isLoading && (
               <Flex justifyContent="space-between">
-                <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
-                <Skeleton isLoaded={!isLoading} w="45%" height="24px" />
+                <Skeleton
+                  isLoaded={!isLoading && !error}
+                  w="45%"
+                  height="24px"
+                />
+                <Skeleton
+                  isLoaded={!isLoading && !error}
+                  w="45%"
+                  height="24px"
+                />
               </Flex>
             )}
-            <Skeleton isLoaded={!isLoading}>
+            <Skeleton isLoaded={!isLoading && !error}>
               <Grid templateColumns="1fr 1fr" justifyItems="start" gap={2}>
-                {getPromiseValue("whiteList")?.map?.((address) => (
+                {data?.whiteList?.map?.((address) => (
                   <Badge
                     fontSize="sm"
                     variant="outline"
@@ -263,7 +265,7 @@ export default function VotingPage({
             Duração
           </Text>
           <Divider mb={1} />
-          <Skeleton isLoaded={!isLoading} w="75%" height="24px">
+          <Skeleton isLoaded={!isLoading && !error} w="75%" height="24px">
             <Text fontWeight="medium">{date ?? "Loading..."}</Text>
           </Skeleton>
         </CardFooter>

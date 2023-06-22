@@ -6,7 +6,7 @@ import { validateEthereumAddress } from "@/utils/validateEthereumAddress";
 import { Input } from "../FormFields/Input";
 import { Textarea } from "../FormFields/Textarea";
 
-interface VotingFormProps extends UseFormReturn<RegisterVotingValues> {
+export interface VotingFormProps extends UseFormReturn<RegisterVotingValues> {
   // onCreateVoting: (data: Voting) => Promise<unknown>;
 }
 
