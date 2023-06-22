@@ -3,11 +3,12 @@
 import { Link, ToastId, useToast } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
 import { useCallback, useRef } from "react";
-import { KeyedMutator } from "swr";
+import useSWR, { KeyedMutator } from "swr";
 import Contract from "web3-eth-contract";
 
 import { TransactionPendingToast } from "@/components/TransationPendingToast";
 import { VotingArtifact } from "@/constants/Voting";
+import { getContractData } from "@/lib/contracts";
 import { formatContractError } from "@/utils/formatContractError";
 
 export const useVoting = (
@@ -17,6 +18,11 @@ export const useVoting = (
   const { account: wallet } = useWeb3React();
   const toastIdRef = useRef<ToastId>();
   const toast = useToast();
+
+  const votingData = useSWR(
+    contract?.options?.address,
+    getContractData(contract)
+  );
 
   const startVoting = useCallback(async () => {
     console.group("START VOTING");
@@ -181,83 +187,88 @@ export const useVoting = (
     [contract, toast, updateContract]
   );
 
-  const editVoting = useCallback(async (data: Voting) => {
-    console.group("EDIT VOTING");
+  const editVoting = useCallback(
+    async (data: Voting) => {
+      console.group("EDIT VOTING");
 
-    try {
-      toastIdRef.current = toast({
-        status: "info",
-        title: "Editando votação",
-        description: "Por favor, confirme a transação na sua carteira",
-        duration: null,
-      });
-
-      const gasLimit = await contract.methods
-        .editTitle(data.title)
-        .estimateGas({
-          from: wallet as string,
+      try {
+        toastIdRef.current = toast({
+          status: "info",
+          title: "Editando votação",
+          description: "Por favor, confirme a transação na sua carteira",
+          duration: null,
         });
 
-      const response = await contract.methods
-        .editTitle(data.title)
-        .send({
-          from: wallet as string,
-          gas: (gasLimit * BigInt(2)).toString(),
-        })
-        .on("error", (error) => {
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "error",
-              title: "Não foi possível editar a votação",
-              description: formatContractError(error),
-            });
-        })
-        .on("transactionHash", (transactionHash) => {
-          console.log(`Transaction hash: ${transactionHash}`);
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              render: (props) => (
-                <TransactionPendingToast
-                  transactionHash={transactionHash}
-                  {...props}
-                />
-              ),
-            });
-        })
-        .on("receipt", (receipt) => {
-          console.log("receipt", receipt);
-          updateContract?.();
-        })
-        .on("confirmation", (confirmation) => {
-          console.log("confirmation", confirmation);
-          if (toastIdRef.current)
-            toast.update(toastIdRef.current, {
-              status: "success",
-              title: "Votação editada com sucesso!",
-              description: (
-                <Link
-                  // color="white"
-                  href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
-                  target="_blank"
-                >
-                  Clique aqui para visualizar bloco na blockchain
-                </Link>
-              ),
-            });
-        });
+        const gasLimit = await contract.methods
+          .editTitle(data.title)
+          .estimateGas({
+            from: wallet as string,
+          });
 
-      console.log("response", response);
-    } catch (e) {
-      if (toastIdRef.current)
-        toast.update(toastIdRef.current, {
-          status: "error",
-          title: "Não foi possível editar a votação",
-          description: formatContractError(e),
-        });
-    }
+        const response = await contract.methods
+          .editTitle(data.title)
+          .send({
+            from: wallet as string,
+            gas: (gasLimit * BigInt(2)).toString(),
+          })
+          .on("error", (error) => {
+            if (toastIdRef.current)
+              toast.update(toastIdRef.current, {
+                status: "error",
+                title: "Não foi possível editar a votação",
+                description: formatContractError(error),
+              });
+          })
+          .on("transactionHash", (transactionHash) => {
+            console.log(`Transaction hash: ${transactionHash}`);
+            if (toastIdRef.current)
+              toast.update(toastIdRef.current, {
+                render: (props) => (
+                  <TransactionPendingToast
+                    transactionHash={transactionHash}
+                    {...props}
+                  />
+                ),
+              });
+          })
+          .on("receipt", (receipt) => {
+            console.log("receipt", receipt);
+            updateContract?.();
+          })
+          .on("confirmation", (confirmation) => {
+            console.log("confirmation", confirmation);
+            if (toastIdRef.current)
+              toast.update(toastIdRef.current, {
+                status: "success",
+                title: "Votação editada com sucesso!",
+                description: (
+                  <Link
+                    // color="white"
+                    href={`https://sepolia.etherscan.io/tx/${confirmation.receipt.transactionHash}`}
+                    target="_blank"
+                  >
+                    Clique aqui para visualizar bloco na blockchain
+                  </Link>
+                ),
+              });
+          });
 
-    console.groupEnd();
-  }, []);
+        console.log("response", response);
+      } catch (e) {
+        console.log("error estimateGas", e);
+
+        if (toastIdRef.current)
+          toast.update(toastIdRef.current, {
+            status: "error",
+            title: "Não foi possível editar a votação",
+            description: formatContractError(e),
+          });
+      }
+
+      console.groupEnd();
+    },
+    [contract, toast, updateContract, wallet]
+  );
 
   const cancelVoting = useCallback(async () => {
     toastIdRef.current = toast({
@@ -335,6 +346,7 @@ export const useVoting = (
   }, [contract, toast, updateContract, wallet]);
 
   return {
+    ...votingData,
     startVoting,
     vote,
     cancelVoting,
