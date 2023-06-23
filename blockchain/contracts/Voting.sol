@@ -144,6 +144,26 @@ contract Voting {
         return addresses;
     }
 
+    function editVoting(
+        string memory newTitle,
+        string[] memory newProposals,
+        address[] memory newWhiteList,
+        uint256 newDuration
+    ) public onlyElectionCommission onlyBeforeStart {
+        title = newTitle;
+        votingDuration = newDuration;
+
+        for (uint i = 0; i < newProposals.length; i++) {
+            proposals.push(Proposal({name: newProposals[i], voteCount: 0}));
+        }
+
+        for (uint i = 0; i < newWhiteList.length; i++) {
+            whiteList[newWhiteList[i]] = 1;
+            exists[newWhiteList[i]] = true;
+            whiteListedAddresses.push(newWhiteList[i]);
+        }
+    }
+
     function editProposal(
         uint proposal,
         string memory newName

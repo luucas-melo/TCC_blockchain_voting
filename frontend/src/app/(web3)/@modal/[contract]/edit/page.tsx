@@ -28,9 +28,19 @@ export default async function EditVoting({
   const data = await getContractData(votingContract)();
   console.log("voting contract data:", data);
   // fake await
-  await new Promise((resolve) => {
-    setTimeout(resolve, 3000);
-  });
+  // await new Promise((resolve) => {
+  //   setTimeout(resolve, 3000);
+  // });
+
+  const convertToDateTimeLocalString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   return (
     <EditVotingModal
@@ -39,7 +49,9 @@ export default async function EditVoting({
         title: data.title,
         proposals: data.proposals.join("\n"),
         whiteList: data.whiteList.join("\n"),
-        deadline: new Date(Number(data.votingDuration) * 1000)?.toISOString?.(),
+        deadline: convertToDateTimeLocalString(
+          new Date(Number(data?.votingDuration) * 1000)
+        ),
       }}
     />
   );
