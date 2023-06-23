@@ -51,10 +51,13 @@ module.exports = {
     //
     sepolia: {
       provider: () =>
-        new HDWalletProvider(mnemonic, `https://eth-sepolia.g.alchemy.com/v2/LnPtKqL-_nHWxwPh9JEumSp4jueeVaCW`),
-      network_id: 11155111, // Goerli's id
+        new HDWalletProvider(
+          mnemonic,
+          `https://eth-sepolia.g.alchemy.com/v2/LnPtKqL-_nHWxwPh9JEumSp4jueeVaCW`
+        ),
+      network_id: 11155111, // Sepolia's id
       gas: '4500000',
-      gasPrice: '10000000000',
+      gasPrice: '90316755968',
       from: '0x68bF9de2267b4A76150d92b4fE8f979c40DD64a1',
     },
   },

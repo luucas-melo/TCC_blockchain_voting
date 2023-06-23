@@ -199,13 +199,13 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
         });
 
         const gasLimit = await contract.methods
-          .editTitle(data.title)
+          .editVoting(data.title, data.proposals, data.whiteList, data.deadline)
           .estimateGas({
             from: wallet as string,
           });
 
         const response = await contract.methods
-          .editTitle(data.title)
+          .editVoting(data.title, data.proposals, data.whiteList, data.deadline)
           .send({
             from: wallet as string,
             gas: (gasLimit * BigInt(2)).toString(),

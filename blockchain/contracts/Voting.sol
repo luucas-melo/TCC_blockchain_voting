@@ -44,8 +44,8 @@ contract Voting {
         for (uint i = 0; i < _whiteList.length; i++) {
             whiteList[_whiteList[i]] = 1;
             exists[_whiteList[i]] = true;
-            whiteListedAddresses.push(_whiteList[i]);
         }
+        whiteListedAddresses = _whiteList;
     }
 
     modifier onlyElectionCommission() {
@@ -153,6 +153,8 @@ contract Voting {
         title = newTitle;
         votingDuration = newDuration;
 
+        delete proposals;
+
         for (uint i = 0; i < newProposals.length; i++) {
             proposals.push(Proposal({name: newProposals[i], voteCount: 0}));
         }
@@ -160,8 +162,8 @@ contract Voting {
         for (uint i = 0; i < newWhiteList.length; i++) {
             whiteList[newWhiteList[i]] = 1;
             exists[newWhiteList[i]] = true;
-            whiteListedAddresses.push(newWhiteList[i]);
         }
+        whiteListedAddresses = newWhiteList;
     }
 
     function editProposal(
