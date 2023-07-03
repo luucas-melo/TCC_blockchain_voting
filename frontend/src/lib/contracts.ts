@@ -61,6 +61,10 @@ export const getContractData =
       .getWhiteListedAddresses()
       .call() as Promise<string[]>;
 
+    const getResultPromise = contract.methods.getResult().call() as Promise<
+      number[]
+    >;
+
     const [
       titleResult,
       votingDurationResult,
@@ -71,6 +75,7 @@ export const getContractData =
       isEndedResult,
       isStartedResult,
       electionChiefResult,
+      getResult,
     ] = await Promise.allSettled([
       titlePromise,
       votingDurationPromise,
@@ -81,6 +86,7 @@ export const getContractData =
       isEndedPromise,
       isStartedPromise,
       electionChiefPromise,
+      getResultPromise,
     ]);
 
     function handleSettledPromise<T>(result: PromiseResult<T>): T {
@@ -92,6 +98,13 @@ export const getContractData =
       throw new Error("Promise rejected", { cause: result?.reason });
     }
 
+    // it can be reajected if the voting has not ended yet
+    function handleVotingResultPromise<T>(
+      result: PromiseResult<T>
+    ): PromiseResult<T> {
+      return result;
+    }
+
     const title = handleSettledPromise(titleResult);
     const votingDuration = handleSettledPromise(votingDurationResult);
     const whiteList = handleSettledPromise(whiteListResult);
@@ -101,6 +114,7 @@ export const getContractData =
     const isEnded = handleSettledPromise(isEndedResult);
     const isStarted = handleSettledPromise(isStartedResult);
     const electionChief = handleSettledPromise(electionChiefResult);
+    const votingResult = handleVotingResultPromise(getResult);
 
     // await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -114,5 +128,6 @@ export const getContractData =
       isEnded,
       isStarted,
       whiteList,
+      votingResult,
     };
   };

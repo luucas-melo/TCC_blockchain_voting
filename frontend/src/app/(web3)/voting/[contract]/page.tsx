@@ -26,8 +26,10 @@ import { MdHowToVote } from "react-icons/md";
 
 import { DangerPopup } from "@/components/DangerPopup";
 import { VotingMenu } from "@/components/VotingMenu";
+import { VotingResult } from "@/components/VotingResult";
 import { useVoting } from "@/hooks/useVoting";
 import { VotingContract, VotingFactoryContract } from "@/lib/contracts";
+import { formatContractError } from "@/utils/formatContractError";
 
 export async function generateStaticParams() {
   const contracts = await VotingFactoryContract.methods
@@ -50,14 +52,6 @@ export default function VotingPage({
 
   const contract = VotingContract(params.contract);
 
-  // const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
-
-  // const {
-  //   data,
-  //   isLoading,
-  //   mutate: updateContract,
-  // } = useSWR(contract?.options?.address, getContractData(contract));
-
   const { data, isLoading, error, startVoting, vote, cancelVoting } = useVoting(
     contract
     // updateContract
@@ -71,7 +65,7 @@ export default function VotingPage({
     return time.toLocaleString();
   }, [data]);
 
-  if (!contract) return null;
+  if (!contract || !data) return null;
 
   return (
     <Flex direction="column">
@@ -201,7 +195,7 @@ export default function VotingPage({
                       onConfirm={vote({ proposalIndex: index })}
                     >
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         leftIcon={<Icon as={MdHowToVote} boxSize={5} />}
                         w="full"
                         size="md"
@@ -214,7 +208,23 @@ export default function VotingPage({
               </Grid>
             </Skeleton>
           </Box>
+          <Box>
+            <Text fontSize="sm" cursor="default">
+              Resultado da votação
+            </Text>
+            <Divider mb={2} />
 
+            {data?.votingResult?.status === "fulfilled" ? (
+              <VotingResult
+                proposals={data?.proposals}
+                votingResult={data?.votingResult?.value}
+              />
+            ) : (
+              <Text color="red.300">
+                {formatContractError(data?.votingResult?.reason)}
+              </Text>
+            )}
+          </Box>
           <Box>
             <Text fontSize="sm" cursor="default">
               Eleitores

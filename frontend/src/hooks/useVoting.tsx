@@ -2,7 +2,7 @@
 
 import { Link, ToastId, useToast } from "@chakra-ui/react";
 import { useWeb3React } from "@web3-react/core";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import useSWR from "swr";
 import Contract from "web3-eth-contract";
 
@@ -13,6 +13,8 @@ import { formatContractError } from "@/utils/formatContractError";
 
 export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
   const { account: wallet } = useWeb3React();
+
+  const [result, setResult] = useState<number[] | string>();
   const toastIdRef = useRef<ToastId>();
   const toast = useToast();
 
@@ -181,7 +183,7 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
             });
         }
       },
-    [contract, toast, votingData]
+    [contract, toast, votingData, wallet]
   );
 
   const editVoting = useCallback(
@@ -264,7 +266,7 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
 
       console.groupEnd();
     },
-    [contract, toast, wallet]
+    [contract, toast, votingData, wallet]
   );
 
   const cancelVoting = useCallback(async () => {
@@ -340,7 +342,7 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
           description: formatContractError(e),
         });
     }
-  }, [contract, toast, wallet]);
+  }, [contract, toast, votingData, wallet]);
 
   return {
     ...votingData,

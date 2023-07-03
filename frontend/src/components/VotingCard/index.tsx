@@ -17,7 +17,7 @@ import {
 import type { Route } from "next";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Contract } from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
@@ -36,6 +36,17 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   const { data, isLoading, error, startVoting, cancelVoting } =
     useVoting(contract);
+
+  const getVotingWinner = useCallback(() => {
+    if (data?.votingResult?.status === "fulfilled") {
+      const votings = data?.votingResult?.value?.map((item) => Number(item));
+      const winner = Math.max(...votings);
+
+      return votings.indexOf(winner);
+    }
+
+    return NaN;
+  }, [data]);
 
   const date = useMemo(() => {
     if (!data?.votingDuration) return "";
@@ -123,11 +134,11 @@ export function VotingCard({ contract }: VotingCardProps) {
           )}
           <Skeleton isLoaded={!isLoading && !error}>
             <Flex flexWrap="wrap" gap={4}>
-              {data?.proposals?.map?.((proposal) => (
+              {data?.proposals?.map?.((proposal, index) => (
                 <Badge
                   fontSize="md"
                   variant="outline"
-                  colorScheme="gray"
+                  colorScheme={getVotingWinner() === index ? "green" : "gray"}
                   textTransform="capitalize"
                   key={proposal}
                 >

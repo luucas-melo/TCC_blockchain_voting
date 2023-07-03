@@ -214,17 +214,18 @@ contract Voting {
     }
 
     function getResult()
-        external
+        public
         view
         onlyAfterVotingEnd
-        returns (uint winningProposal_)
+        returns (uint[] memory)
     {
-        uint winningVoteCount = 0;
-        for (uint p = 0; p < proposals.length; p++) {
-            if (proposals[p].voteCount > winningVoteCount) {
-                winningVoteCount = proposals[p].voteCount;
-                winningProposal_ = p;
-            }
+        uint arrayLength = proposals.length;
+
+        uint[] memory voteCounts = new uint[](arrayLength);
+
+        for (uint i = 0; i < arrayLength; i++) {
+            voteCounts[i] = proposals[i].voteCount;
         }
+        return voteCounts;
     }
 }
