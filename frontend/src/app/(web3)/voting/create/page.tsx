@@ -48,9 +48,9 @@ const CreateVoting = () => {
 
       const VotingFactoryContract = new window.web3.eth.Contract(
         VotingFactoryArtifact.abi,
-        Object.entries(VotingFactoryArtifact.networks)[1][1].address
+        // sepolia network id
+        VotingFactoryArtifact.networks?.[11155111]?.address
       );
-
       const gasLimit = await VotingFactoryContract.methods
         .deploy(title, proposals, whiteList, deadline)
         .estimateGas({ from: wallet as string });

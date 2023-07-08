@@ -7,7 +7,8 @@ import { web3 } from "./web3";
 
 export const VotingFactoryContract = new web3.eth.Contract(
   VotingFactoryArtifact.abi,
-  Object.entries(VotingFactoryArtifact.networks)[1][1].address
+  // sepolia network id
+  VotingFactoryArtifact.networks?.[11155111]?.address
 );
 
 export const VotingContract = (address: string) => {
