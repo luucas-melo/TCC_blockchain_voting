@@ -165,7 +165,7 @@ export default function VotingPage({
             )}
             <Skeleton isLoaded={!isLoading && !error}>
               <Grid
-                templateColumns="repeat(auto-fit, minmax(0, 200px))"
+                templateColumns="repeat(auto-fit, minmax(0, 220px))"
                 gap={8}
               >
                 {data?.proposals?.map?.((proposal, index) => (
@@ -186,6 +186,7 @@ export default function VotingPage({
                       fontSize="lg"
                       fontWeight="semibold"
                       textTransform="capitalize"
+                      textAlign="center"
                     >
                       {proposal}
                     </Text>

@@ -21,6 +21,7 @@ import { useCallback, useMemo } from "react";
 import { Contract } from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
+import { useScrollShadow } from "@/hooks/useScrollShadow";
 import { useVoting } from "@/hooks/useVoting";
 
 import { VotingMenu } from "../VotingMenu";
@@ -55,6 +56,14 @@ export function VotingCard({ contract }: VotingCardProps) {
 
     return time.toLocaleString();
   }, [data]);
+
+  const scrollShadow = useScrollShadow();
+
+  const hideScrollbar = {
+    "::-webkit-scrollbar": { display: "none" } /* Chrome, Safari, Opera */,
+    msOverflowStyle: "none" /* IE and Edge */,
+    scrollbarWidth: "none" /* Firefox */,
+  };
 
   return (
     <Flex direction="column">
@@ -133,19 +142,29 @@ export function VotingCard({ contract }: VotingCardProps) {
             </Flex>
           )}
           <Skeleton isLoaded={!isLoading && !error}>
-            <Flex flexWrap="wrap" gap={4}>
-              {data?.proposals?.map?.((proposal, index) => (
-                <Badge
-                  fontSize="md"
-                  variant="outline"
-                  colorScheme={getVotingWinner() === index ? "green" : "gray"}
-                  textTransform="capitalize"
-                  key={proposal}
-                >
-                  {proposal}
-                </Badge>
-              ))}
-            </Flex>
+            <Box
+              ref={scrollShadow.wrapperRef}
+              onScroll={scrollShadow.onScrollHandler}
+              sx={hideScrollbar}
+            >
+              <scrollShadow.ShadowTop />
+
+              <Flex flexWrap="wrap" gap={4} paddingRight={2}>
+                {data?.proposals?.map?.((proposal, index) => (
+                  <Badge
+                    fontSize="md"
+                    variant="outline"
+                    colorScheme={getVotingWinner() === index ? "green" : "gray"}
+                    textTransform="capitalize"
+                    key={proposal}
+                    whiteSpace="unset"
+                  >
+                    {proposal}
+                  </Badge>
+                ))}
+              </Flex>
+              <scrollShadow.ShadowBottom />
+            </Box>
           </Skeleton>
         </CardBody>
 
