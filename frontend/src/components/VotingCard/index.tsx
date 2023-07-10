@@ -54,7 +54,7 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   useEffect(() => {
     if (data) forceRerender();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on ref change
   }, [data]);
 
   const hideScrollbar = {

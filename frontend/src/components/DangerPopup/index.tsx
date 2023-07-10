@@ -56,7 +56,7 @@ export function DangerPopup(props: DangerPopupProps) {
       <PopoverTrigger>{children}</PopoverTrigger>
 
       <Portal>
-        <PopoverContent borderRadius="base" boxShadow="da">
+        <PopoverContent borderRadius="base" boxShadow="2xl">
           <PopoverArrow />
           <PopoverCloseButton top={2.5} right={2} />
 
