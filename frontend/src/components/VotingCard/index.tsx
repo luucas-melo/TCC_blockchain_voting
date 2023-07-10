@@ -156,50 +156,20 @@ export function VotingCard({ contract }: VotingCardProps) {
 
               <Flex flexWrap="wrap" gap={4} paddingRight={2}>
                 {data?.proposals?.map?.((proposal, index) => (
-                  <>
-                    <Badge
-                      fontSize="md"
-                      variant="outline"
-                      colorScheme={
-                        getVotingWinner(data?.votingResult) === index
-                          ? "green"
-                          : "gray"
-                      }
-                      textTransform="capitalize"
-                      key={proposal}
-                      whiteSpace="unset"
-                    >
-                      {proposal}
-                    </Badge>
-                    <Badge
-                      fontSize="md"
-                      variant="outline"
-                      colorScheme={
-                        getVotingWinner(data?.votingResult) === index
-                          ? "green"
-                          : "gray"
-                      }
-                      textTransform="capitalize"
-                      key={proposal}
-                      whiteSpace="unset"
-                    >
-                      {proposal}
-                    </Badge>
-                    <Badge
-                      fontSize="md"
-                      variant="outline"
-                      colorScheme={
-                        getVotingWinner(data?.votingResult) === index
-                          ? "green"
-                          : "gray"
-                      }
-                      textTransform="capitalize"
-                      key={proposal}
-                      whiteSpace="unset"
-                    >
-                      {proposal}
-                    </Badge>
-                  </>
+                  <Badge
+                    fontSize="md"
+                    variant="outline"
+                    colorScheme={
+                      getVotingWinner(data?.votingResult) === index
+                        ? "green"
+                        : "gray"
+                    }
+                    textTransform="capitalize"
+                    key={proposal}
+                    whiteSpace="unset"
+                  >
+                    {proposal}
+                  </Badge>
                 ))}
               </Flex>
               <scrollShadow.ShadowBottom />
