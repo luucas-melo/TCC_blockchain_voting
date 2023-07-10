@@ -10322,6 +10322,12 @@ export const VotingFactoryArtifact = {
     "version": "0.8.13+commit.abaa5c0e.Emscripten.clang"
   },
   "networks": {
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0x6AAE9B915468045d7556b173EeC619B0c3802c71",
+      "transactionHash": "0x23a9ba0cc8d968a43e24608b0790398b841c1821bb5f4c19a522bcbdc79bb829"
+    },
     "11155111": {
       "events": {},
       "links": {},
@@ -10330,7 +10336,7 @@ export const VotingFactoryArtifact = {
     }
   },
   "schemaVersion": "3.4.10",
-  "updatedAt": "2023-07-08T23:46:15.062Z",
+  "updatedAt": "2023-07-10T15:13:40.287Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

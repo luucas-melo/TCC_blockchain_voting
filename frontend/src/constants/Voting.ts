@@ -27503,7 +27503,7 @@ export const VotingArtifact = {
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2023-07-08T23:45:49.180Z",
+  "updatedAt": "2023-07-10T15:13:23.572Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
