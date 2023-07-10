@@ -120,4 +120,17 @@ contract TestVoting {
             "Voting should have started"
         );
     }
+
+    function testGetResultVotingNotEnded() public {
+        // Call the getResult function before the voting has ended
+        (bool success, ) = address(voting).call(
+            abi.encodeWithSignature("getResult()")
+        );
+
+        // Verify the result
+        Assert.isFalse(
+            success,
+            "Should not be able to get the result before the voting ends"
+        );
+    }
 }
