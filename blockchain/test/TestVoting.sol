@@ -15,6 +15,7 @@ contract TestVoting {
         address[] memory initialWhiteList = new address[](3);
         initialWhiteList[0] = address(0x1);
         initialWhiteList[1] = address(0x2);
+        initialWhiteList[2] = address(this);
         voting = new Voting(
             address(this),
             "Test Voting",
@@ -79,6 +80,11 @@ contract TestVoting {
         // Verify the initial whitelist
         address[] memory initialWhiteList = voting.getWhiteListedAddresses();
         Assert.equal(
+            initialWhiteList.length,
+            3,
+            "Incorrect number of initial whitelist addresses"
+        );
+        Assert.equal(
             initialWhiteList[0],
             address(0x1),
             "Incorrect initial whitelist address 1"
@@ -103,6 +109,15 @@ contract TestVoting {
         Assert.isFalse(
             success,
             "Only whitelisted addresses should be able to vote"
+        );
+    }
+
+    function testStartVoting() public {
+        voting.startVoting();
+        Assert.equal(
+            voting.votingStarted(),
+            true,
+            "Voting should have started"
         );
     }
 }
