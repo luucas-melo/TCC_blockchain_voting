@@ -17,7 +17,7 @@ import {
 import type { Route } from "next";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { Contract } from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
@@ -35,19 +35,8 @@ export function VotingCard({ contract }: VotingCardProps) {
 
   const router = useRouter();
 
-  const { data, isLoading, error, startVoting, cancelVoting } =
+  const { data, isLoading, error, startVoting, cancelVoting, getVotingWinner } =
     useVoting(contract);
-
-  const getVotingWinner = useCallback(() => {
-    if (data?.votingResult?.status === "fulfilled") {
-      const votings = data?.votingResult?.value?.map((item) => Number(item));
-      const winner = Math.max(...votings);
-
-      return votings.indexOf(winner);
-    }
-
-    return NaN;
-  }, [data]);
 
   const date = useMemo(() => {
     if (!data?.votingDuration) return "";
@@ -111,7 +100,14 @@ export function VotingCard({ contract }: VotingCardProps) {
                 cursor="default"
               >
                 {data?.isStarted ? "" : "Não iniciada"}
-                {data?.isOpen ? "Aberta" : ""}
+                {data?.isOpen &&
+                Number.isNaN(getVotingWinner(data?.votingResult))
+                  ? "Aberta"
+                  : ""}
+                {data?.isOpen &&
+                !Number.isNaN(getVotingWinner(data?.votingResult))
+                  ? "Finalizada"
+                  : ""}
                 {data?.isEnded ? "Fechada" : ""}
                 {data?.isCancelled ? "Cancelada" : ""}
               </Badge>
@@ -154,7 +150,11 @@ export function VotingCard({ contract }: VotingCardProps) {
                   <Badge
                     fontSize="md"
                     variant="outline"
-                    colorScheme={getVotingWinner() === index ? "green" : "gray"}
+                    colorScheme={
+                      getVotingWinner(data?.votingResult) === index
+                        ? "green"
+                        : "gray"
+                    }
                     textTransform="capitalize"
                     key={proposal}
                     whiteSpace="unset"

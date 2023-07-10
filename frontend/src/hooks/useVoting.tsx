@@ -269,6 +269,22 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
     [contract, toast, votingData, wallet]
   );
 
+  type PromiseResult<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
+
+  const getVotingWinner = useCallback(
+    (votingResult: PromiseResult<number[]>) => {
+      if (votingResult?.status === "fulfilled") {
+        const votings = votingResult?.value?.map((item) => Number(item));
+        const winner = Math.max(...votings);
+
+        return votings.indexOf(winner);
+      }
+
+      return NaN;
+    },
+    []
+  );
+
   const cancelVoting = useCallback(async () => {
     toastIdRef.current = toast({
       status: "info",
@@ -350,5 +366,6 @@ export const useVoting = (contract: Contract<typeof VotingArtifact.abi>) => {
     vote,
     cancelVoting,
     editVoting,
+    getVotingWinner,
   };
 };

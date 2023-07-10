@@ -52,7 +52,15 @@ export default function VotingPage({
 
   const contract = VotingContract(params.contract);
 
-  const { data, isLoading, error, startVoting, vote, cancelVoting } = useVoting(
+  const {
+    data,
+    isLoading,
+    error,
+    startVoting,
+    vote,
+    cancelVoting,
+    getVotingWinner,
+  } = useVoting(
     contract
     // updateContract
   );
@@ -111,7 +119,14 @@ export default function VotingPage({
                 fontSize="sm"
               >
                 {data?.isStarted ? "" : "Não iniciada"}
-                {data?.isOpen ? "Aberta" : ""}
+                {data?.isOpen &&
+                Number.isNaN(getVotingWinner(data?.votingResult))
+                  ? "Aberta"
+                  : ""}
+                {data?.isOpen &&
+                !Number.isNaN(getVotingWinner(data?.votingResult))
+                  ? "Finalizada"
+                  : ""}
                 {data?.isEnded ? "Fechada" : ""}
                 {data?.isCancelled ? "Cancelada" : ""}
               </Badge>
