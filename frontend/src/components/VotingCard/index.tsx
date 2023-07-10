@@ -17,7 +17,7 @@ import {
 import type { Route } from "next";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { Contract } from "web3-eth-contract";
 
 import { VotingArtifact } from "@/constants/Voting";
@@ -29,6 +29,8 @@ import { VotingMenu } from "../VotingMenu";
 interface VotingCardProps {
   contract: Contract<typeof VotingArtifact.abi>;
 }
+
+const useForceRerender = () => useReducer(() => ({}), {})[1] as () => void;
 
 export function VotingCard({ contract }: VotingCardProps) {
   const background = useColorModeValue("whiteAlpha.700", "blackAlpha.600");
@@ -47,6 +49,13 @@ export function VotingCard({ contract }: VotingCardProps) {
   }, [data]);
 
   const scrollShadow = useScrollShadow();
+
+  const forceRerender = useForceRerender();
+
+  useEffect(() => {
+    if (data) forceRerender();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const hideScrollbar = {
     "::-webkit-scrollbar": { display: "none" } /* Chrome, Safari, Opera */,
@@ -147,20 +156,50 @@ export function VotingCard({ contract }: VotingCardProps) {
 
               <Flex flexWrap="wrap" gap={4} paddingRight={2}>
                 {data?.proposals?.map?.((proposal, index) => (
-                  <Badge
-                    fontSize="md"
-                    variant="outline"
-                    colorScheme={
-                      getVotingWinner(data?.votingResult) === index
-                        ? "green"
-                        : "gray"
-                    }
-                    textTransform="capitalize"
-                    key={proposal}
-                    whiteSpace="unset"
-                  >
-                    {proposal}
-                  </Badge>
+                  <>
+                    <Badge
+                      fontSize="md"
+                      variant="outline"
+                      colorScheme={
+                        getVotingWinner(data?.votingResult) === index
+                          ? "green"
+                          : "gray"
+                      }
+                      textTransform="capitalize"
+                      key={proposal}
+                      whiteSpace="unset"
+                    >
+                      {proposal}
+                    </Badge>
+                    <Badge
+                      fontSize="md"
+                      variant="outline"
+                      colorScheme={
+                        getVotingWinner(data?.votingResult) === index
+                          ? "green"
+                          : "gray"
+                      }
+                      textTransform="capitalize"
+                      key={proposal}
+                      whiteSpace="unset"
+                    >
+                      {proposal}
+                    </Badge>
+                    <Badge
+                      fontSize="md"
+                      variant="outline"
+                      colorScheme={
+                        getVotingWinner(data?.votingResult) === index
+                          ? "green"
+                          : "gray"
+                      }
+                      textTransform="capitalize"
+                      key={proposal}
+                      whiteSpace="unset"
+                    >
+                      {proposal}
+                    </Badge>
+                  </>
                 ))}
               </Flex>
               <scrollShadow.ShadowBottom />
