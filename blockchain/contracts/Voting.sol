@@ -51,7 +51,7 @@ contract Voting {
     modifier onlyElectionCommission() {
         require(
             msg.sender == electionCommission,
-            "Only Election Commission can give right to vote."
+            "Only Election Commission can invoke this action."
         );
         _;
     }
