@@ -62,10 +62,7 @@ contract Voting {
     }
 
     modifier onlyBeforeVotingEnd() {
-        require(
-            block.timestamp < (votingStartTime + votingDuration),
-            "Voting has already ended."
-        );
+        require(block.timestamp < votingDuration, "Voting has already ended.");
         _;
     }
 
